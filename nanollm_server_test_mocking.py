@@ -77,8 +77,10 @@ async def chat_completions(request):
                     "total_tokens": len(prompt.split()) + len(response_from_llm.split())
                 }
             }
+
+            print(f'Response: {completion_response}')
             
-            return json(completion_response)
+            return response.json(completion_response)
         
         else:
             chunk_id = f"chatcmpl-{str(hash(prompt))[:8]}"
@@ -124,4 +126,4 @@ async def chat_completions(request):
             await response.send("data: [DONE]\n\n")
     
     except Exception as e:
-        return json({"error": str(e)}, status=500)
+        return response.json({"error": str(e)}, status=500)
