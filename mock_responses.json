@@ -1,0 +1,4 @@
+{
+  "regular_response": "This is a mock response from the JSON file",
+  "stream_response": "This is a streaming mock response that will be split into tokens"
+}
