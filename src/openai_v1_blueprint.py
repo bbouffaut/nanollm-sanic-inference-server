@@ -18,9 +18,9 @@ async def chat_completions(request):
         
         prompt = ""
         for msg in messages:
-            role = msg.get("role", "user")
+            # role = msg.get("role", "user")
             content = msg.get("content", "")
-            prompt += f"{role}: {content}\n"
+            prompt += f"{content}\n"
 
         if not stream:
             response_from_llm = await app.ctx.model.generate(
