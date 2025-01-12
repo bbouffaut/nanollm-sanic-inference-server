@@ -24,7 +24,6 @@ async def chat_completions(request):
 
         if not stream:
             response_from_llm = await app.ctx.model.generate(
-                request,
                 prompt,
                 max_tokens=data.get("max_tokens", 100),
                 temperature=data.get("temperature", 0.7)
@@ -64,7 +63,6 @@ async def chat_completions(request):
             response.headers["Connection"] = "keep-alive"
             
             async for token in app.ctx.model.generate_stream(
-                request,
                 prompt,
                 max_tokens=data.get("max_tokens", 100),
                 temperature=data.get("temperature", 0.7)
