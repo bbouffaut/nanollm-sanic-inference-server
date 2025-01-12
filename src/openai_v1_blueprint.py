@@ -94,20 +94,26 @@ async def chat_completions(request):
             max_tokens=data.get("max_tokens", 100),
             temperature=data.get("temperature", 0.7)
         ):
-            chunk = {
-                "id": chunk_id,
-                "object": "chat.completion.chunk",
-                "created": int(time.time()),
-                "model": "nanollm",
-                "choices": [{
-                    "index": 0,
-                    "delta": {
-                        "role": "assistant",
-                        "content": token
-                    },
-                    "finish_reason": None
-                }]
-            }
+            if isinstance(token, dict):
+                if token.get('choices', [{}])[0].get('finish_reason') is not None:
+                    continue
+                chunk = token
+            else:
+                chunk = {
+                    "id": chunk_id,
+                    "object": "chat.completion.chunk",
+                    "created": int(time.time()),
+                    "model": "nanollm",
+                    "choices": [{
+                        "index": 0,
+                        "delta": {
+                            "role": "assistant",
+                            "content": token
+                        },
+                        "finish_reason": None
+                    }]
+                }
+            
             await response.send(f"data: {json.dumps(chunk)}\n\n")
         
         final_chunk = {
