@@ -37,7 +37,7 @@ class LlamaCppModel(ModelAdapter):
     name: str = "EchoModel"
 
     def __init__(self):
-        self.llm = Llama(model_path=MODEL_PATH, chat_format="chatml")
+        self.llm = Llama(model_path=MODEL_PATH, chat_format="chatml", n_gpu_layers=-1)
 
     async def generate(self, messages, max_tokens=100, temperature=0.7):
         return llama_cpp_generate(messages, self.llm, temperature)
