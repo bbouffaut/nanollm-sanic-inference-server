@@ -6,28 +6,35 @@ from sanic.response import json as response_json
 
 openai_v1_bp = Blueprint('openai', url_prefix = '/v1')
 
+def count_messages_total_tokens(messages):
+    # This is a simple implementation and may not be accurate for all cases.
+    # For more accurate token counting, consider using a tokenizer library.
+    return sum([len(msg.get("content", "").split()) for msg in messages])
+
+def compute_message_hash(messages):
+    # Convert messages to string and hash it
+    message_str = ''.join([msg.get("content", "") for msg in messages])
+    hash_value = str(hash(message_str))[:8]
+    return hash_value
+
+
 @openai_v1_bp.post("/chat/completions")
 async def chat_completions(request):
-
     app = request.app
+    data = request.json
+    messages = data.get("messages", [])
+    stream = data.get("stream", False)
+    prompt_tokens = count_messages_total_tokens(messages)
 
-    try:
-        data = request.json
-        messages = data.get("messages", [])
-        stream = data.get("stream", False)
-        
-        prompt = ""
-        for msg in messages:
-            # role = msg.get("role", "user")
-            content = msg.get("content", "")
-            prompt += f"{content}\n"
-
-        if not stream:
+    if not stream:
+        try:
             response_from_llm = await app.ctx.model.generate(
-                prompt,
+                messages,
                 max_tokens=data.get("max_tokens", 100),
                 temperature=data.get("temperature", 0.7)
             )
+
+            completion_tokens = len(response_from_llm.split())
             
             completion_response = {
                 "id": "chatcmpl-" + str(hash(response_from_llm))[:8],
@@ -43,60 +50,62 @@ async def chat_completions(request):
                     "finish_reason": "stop"
                 }],
                 "usage": {
-                    "prompt_tokens": len(prompt.split()),
-                    "completion_tokens": len(response_from_llm.split()),
-                    "total_tokens": len(prompt.split()) + len(response_from_llm.split())
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                    "total_tokens": prompt_tokens + completion_tokens
                 }
             }
 
             print(f'Response: {completion_response}')
             
             return response_json(completion_response)
-        
-        else:
-
-            response = await request.respond(content_type="text/event-stream")
-
-            chunk_id = f"chatcmpl-{str(hash(prompt))[:8]}"
-
-            response.headers["Cache-Control"] = "no-cache"
-            response.headers["Connection"] = "keep-alive"
-            
-            async for token in app.ctx.model.generate_stream(
-                prompt,
-                max_tokens=data.get("max_tokens", 100),
-                temperature=data.get("temperature", 0.7)
-            ):
-                chunk = {
-                    "id": chunk_id,
-                    "object": "chat.completion.chunk",
-                    "created": int(time.time()),
-                    "model": "nanollm",
-                    "choices": [{
-                        "index": 0,
-                        "delta": {
-                            "role": "assistant",
-                            "content": token
-                        },
-                        "finish_reason": None
-                    }]
-                }
-                await response.send(f"data: {json.dumps(chunk)}\n\n")
-            
-            final_chunk = {
+        except Exception as e:
+            return response_json({"error": str(e)}, status=500)
+    
+    # Streaming response
+    response = await request.respond(content_type="text/event-stream")
+    chunk_id = f"chatcmpl-{compute_message_hash(messages)}"
+    
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Connection"] = "keep-alive"
+    
+    try:
+        async for token in app.ctx.model.generate_stream(
+            messages,
+            max_tokens=data.get("max_tokens", 100),
+            temperature=data.get("temperature", 0.7)
+        ):
+            chunk = {
                 "id": chunk_id,
                 "object": "chat.completion.chunk",
                 "created": int(time.time()),
                 "model": "nanollm",
                 "choices": [{
                     "index": 0,
-                    "delta": {},
-                    "finish_reason": "stop"
+                    "delta": {
+                        "role": "assistant",
+                        "content": token
+                    },
+                    "finish_reason": None
                 }]
             }
-            
-            await response.send(f"data: {json.dumps(final_chunk)}\n\n")
-            await response.send("data: [DONE]\n\n")
-    
+            await response.send(f"data: {json.dumps(chunk)}\n\n")
+        
+        final_chunk = {
+            "id": chunk_id,
+            "object": "chat.completion.chunk",
+            "created": int(time.time()),
+            "model": "nanollm",
+            "choices": [{
+                "index": 0,
+                "delta": {},
+                "finish_reason": "stop"
+            }]
+        }
+        
+        await response.send(f"data: {json.dumps(final_chunk)}\n\n")
+        await response.send("data: [DONE]\n\n")
     except Exception as e:
-        return response_json({"error": str(e)}, status=500)
+        await response.send(f"data: {json.dumps({'error': str(e)})}\n\n")
+    finally:
+        await response.eof()
