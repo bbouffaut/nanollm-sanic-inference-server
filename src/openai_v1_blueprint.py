@@ -1,6 +1,7 @@
 import json
 import time
-from sanic import Blueprint, Sanic
+from sanic import Blueprint
+from sanic.response import json as response_json
 
 
 openai_v1_bp = Blueprint('openai', url_prefix = '/v1')
@@ -14,8 +15,6 @@ async def chat_completions(request):
         data = request.json
         messages = data.get("messages", [])
         stream = data.get("stream", False)
-
-        response = await request.respond()
         
         prompt = ""
         for msg in messages:
@@ -52,12 +51,14 @@ async def chat_completions(request):
 
             print(f'Response: {completion_response}')
             
-            return response.json(completion_response)
+            return response_json(completion_response)
         
         else:
+
+            response = await request.respond(content_type="text/event-stream")
+
             chunk_id = f"chatcmpl-{str(hash(prompt))[:8]}"
 
-            response.headers["Content-Type"] = "text/event-stream"
             response.headers["Cache-Control"] = "no-cache"
             response.headers["Connection"] = "keep-alive"
             
@@ -98,4 +99,4 @@ async def chat_completions(request):
             await response.send("data: [DONE]\n\n")
     
     except Exception as e:
-        return response.json({"error": str(e)}, status=500)
+        return response_json({"error": str(e)}, status=500)
