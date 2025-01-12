@@ -1,43 +1,15 @@
-from sanic import Sanic, json
-import asyncio
 import json
 import time
+from sanic import Blueprint, Sanic
 
-app = Sanic("nanollm_server")
 
-# Load mock data
-with open('mock_responses.json', 'r') as f:
-    MOCK_DATA = json.load(f)
+openai_v1_bp = Blueprint('openai', url_prefix = '/v1')
 
-async def mock_generate(prompt, max_tokens=100, temperature=0.7):
-    return MOCK_DATA["regular_response"]
-
-async def mock_generate_stream(prompt, max_tokens=100, temperature=0.7):
-    stream_text = MOCK_DATA["stream_response"]
-    # Split into tokens (words for this example)
-    tokens = stream_text.split()
-    for token in tokens:
-        await asyncio.sleep(0.1)  # Simulate generation delay
-        yield token + " "
-
-# Replace the model with mock functions
-class MockModel:
-    async def generate(self, prompt, max_tokens=100, temperature=0.7):
-        return await mock_generate(prompt, max_tokens, temperature)
-    
-    async def generate_stream(self, prompt, max_tokens=100, temperature=0.7):
-        async for token in mock_generate_stream(prompt, max_tokens, temperature):
-            yield token
-
-# Set mock model in app context
-@app.before_server_start
-async def setup_mock(app, loop):
-    app.ctx.model = MockModel()
-
-@app.post("/v1/chat/completions")
+@openai_v1_bp.post("/chat/completions")
 async def chat_completions(request):
-    # Rest of the original code remains the same
-    # The mock will be automatically used since we replaced the model
+
+    app = request.app
+
     try:
         data = request.json
         messages = data.get("messages", [])
