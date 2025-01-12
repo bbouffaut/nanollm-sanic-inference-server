@@ -1,3 +1,4 @@
+import asyncio
 from sanic import Sanic
 
 from src.model_adapter import ModelAdapter
@@ -12,9 +13,12 @@ def create_server(model_adapter: ModelAdapter) -> Sanic:
 
     # Set mock model in app context
     @app.before_server_start
-    async def setup_mock(app, loop):
+    async def setup_model(app):
+        if hasattr(model_adapter, '__init__'):
+            if asyncio.iscoroutinefunction(model_adapter.__init__):
+                await model_adapter.__init__()
+            else:
+                model_adapter.__init__()
         app.ctx.model = model_adapter
-
-   
 
     return app

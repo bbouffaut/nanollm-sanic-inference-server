@@ -34,26 +34,45 @@ async def chat_completions(request):
                 temperature=data.get("temperature", 0.7)
             )
 
-            completion_tokens = len(response_from_llm.split())
-            
-            completion_response = {
-                "id": "chatcmpl-" + str(hash(response_from_llm))[:8],
-                "object": "chat.completion",
-                "created": int(time.time()),
-                "model": "nanollm",
-                "choices": [{
+            if isinstance(response_from_llm, dict):
+                content = response_from_llm.get('content', '')
+                usage = response_from_llm.get('usage', {
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": len(content.split()),
+                    "total_tokens": prompt_tokens + len(content.split())
+                })
+                choices = response_from_llm.get('choices', [{
                     "index": 0,
                     "message": {
                         "role": "assistant",
-                        "content": response_from_llm
+                        "content": content
                     },
                     "finish_reason": "stop"
-                }],
-                "usage": {
+                }])
+            else:
+                content = response_from_llm
+                completion_tokens = len(content.split())
+                usage = {
                     "prompt_tokens": prompt_tokens,
                     "completion_tokens": completion_tokens,
                     "total_tokens": prompt_tokens + completion_tokens
                 }
+                choices = [{
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": content
+                    },
+                    "finish_reason": "stop"
+                }]
+            
+            completion_response = {
+                "id": "chatcmpl-" + str(hash(content))[:8],
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": "nanollm",
+                "choices": choices,
+                "usage": usage
             }
 
             print(f'Response: {completion_response}')
