@@ -3,13 +3,11 @@ import time
 from sanic import Blueprint
 from sanic.response import json as response_json
 
+from src.logger import logger
+from src.openai_services import compute_usage_from_dict, compute_usage_from_text
+
 
 openai_v1_bp = Blueprint('openai', url_prefix = '/v1')
-
-def count_messages_total_tokens(messages):
-    # This is a simple implementation and may not be accurate for all cases.
-    # For more accurate token counting, consider using a tokenizer library.
-    return sum([len(msg.get("content", "").split()) for msg in messages])
 
 def compute_message_hash(messages):
     # Convert messages to string and hash it
@@ -24,10 +22,16 @@ async def chat_completions(request):
     data = request.json
     messages = data.get("messages", [])
     stream = data.get("stream", False)
-    prompt_tokens = count_messages_total_tokens(messages)
+   
 
+    # Process non-streaming response
     if not stream:
+
         try:
+
+            usage: dict = {}
+            choices: dict = {}
+
             response_from_llm = await app.ctx.model.generate(
                 messages,
                 max_tokens=data.get("max_tokens", 100),
@@ -35,39 +39,35 @@ async def chat_completions(request):
             )
 
             if isinstance(response_from_llm, dict):
-                content = response_from_llm.get('content', '')
-                usage = response_from_llm.get('usage', {
-                    "prompt_tokens": prompt_tokens,
-                    "completion_tokens": len(content.split()),
-                    "total_tokens": prompt_tokens + len(content.split())
-                })
-                choices = response_from_llm.get('choices', [{
-                    "index": 0,
-                    "message": {
-                        "role": "assistant",
-                        "content": content
-                    },
-                    "finish_reason": "stop"
-                }])
+
+                choices = response_from_llm.get('choices')
+                logger.debug(f'Response is Dict with choices = {choices}')
+
+                usage = compute_usage_from_dict(
+                    messages,
+                    response_from_llm,
+                    app.ctx.model
+                )
+            
             else:
-                content = response_from_llm
-                completion_tokens = len(content.split())
-                usage = {
-                    "prompt_tokens": prompt_tokens,
-                    "completion_tokens": completion_tokens,
-                    "total_tokens": prompt_tokens + completion_tokens
-                }
+                
+                usage = compute_usage_from_text(
+                    messages,
+                    response_from_llm,
+                    app.ctx.model
+                )
+                
                 choices = [{
                     "index": 0,
                     "message": {
                         "role": "assistant",
-                        "content": content
+                        "content": response_from_llm
                     },
                     "finish_reason": "stop"
                 }]
             
             completion_response = {
-                "id": "chatcmpl-" + str(hash(content))[:8],
+                "id": "chatcmpl-" + compute_message_hash(messages),
                 "object": "chat.completion",
                 "created": int(time.time()),
                 "model": "nanollm",
@@ -75,10 +75,12 @@ async def chat_completions(request):
                 "usage": usage
             }
 
-            print(f'Response: {completion_response}')
+            logger.info(f'Response: {completion_response}')
             
             return response_json(completion_response)
+        
         except Exception as e:
+
             return response_json({"error": str(e)}, status=500)
     
     # Streaming response
@@ -130,7 +132,9 @@ async def chat_completions(request):
         
         await response.send(f"data: {json.dumps(final_chunk)}\n\n")
         await response.send("data: [DONE]\n\n")
+    
     except Exception as e:
         await response.send(f"data: {json.dumps({'error': str(e)})}\n\n")
+    
     finally:
         await response.eof()

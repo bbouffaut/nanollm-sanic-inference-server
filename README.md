@@ -1,2 +1,2 @@
 # launch sanic server
-`sanic llama_cpp_server:app --dev`
+`export ENV_FILE_PATH=./config/.env && sanic llama_cpp_server:app --dev`
