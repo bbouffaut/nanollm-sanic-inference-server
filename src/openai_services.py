@@ -50,7 +50,7 @@ def compute_usage_from_dict(messages: dict, response_from_llm: dict, model: Mode
 
     else:
 
-        logger.debug(f'compute_usage_from_dict with usage = {response_from_llm["usage"]}')
+        logger.debug(f'compute_usage_from_dict with usage coming from LLM response = {response_from_llm["usage"]}')
         usage = response_from_llm.get('usage')
 
     return usage

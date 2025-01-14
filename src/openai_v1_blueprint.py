@@ -22,6 +22,7 @@ async def chat_completions(request):
     data = request.json
     messages = data.get("messages", [])
     stream = data.get("stream", False)
+    include_usage = data.get("include_usage", False)
    
 
     # Process non-streaming response
@@ -43,19 +44,23 @@ async def chat_completions(request):
                 choices = response_from_llm.get('choices')
                 logger.debug(f'Response is Dict with choices = {choices}')
 
-                usage = compute_usage_from_dict(
-                    messages,
-                    response_from_llm,
-                    app.ctx.model
-                )
+                if include_usage:
+                    
+                    usage = compute_usage_from_dict(
+                        messages,
+                        response_from_llm,
+                        app.ctx.model
+                    )
             
             else:
                 
-                usage = compute_usage_from_text(
-                    messages,
-                    response_from_llm,
-                    app.ctx.model
-                )
+                if include_usage:
+
+                    usage = compute_usage_from_text(
+                        messages,
+                        response_from_llm,
+                        app.ctx.model
+                    )
                 
                 choices = [{
                     "index": 0,
