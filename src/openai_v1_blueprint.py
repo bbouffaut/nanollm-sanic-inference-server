@@ -24,7 +24,6 @@ async def chat_completions(request):
     stream = data.get("stream", False)
     include_usage = data.get("include_usage", False)
    
-
     # Process non-streaming response
     if not stream:
 
@@ -45,7 +44,7 @@ async def chat_completions(request):
                 logger.debug(f'Response is Dict with choices = {choices}')
 
                 if include_usage:
-                    
+
                     usage = compute_usage_from_dict(
                         messages,
                         response_from_llm,
