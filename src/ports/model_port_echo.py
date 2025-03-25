@@ -1,6 +1,5 @@
-from src.constants import MODEL_PATH
-from src.model_adapter import ModelAdapter
-from src.openai_services import generate_prompt_text_from_messages
+from src.adapters.model_adapter import ModelAdapter
+from src.services.openai_services import generate_prompt_text_from_messages
 
 
 async def mirror_generate(prompt):
@@ -14,11 +13,9 @@ async def mirror_generate_stream(prompt):
         yield token + " "
 
 # Replace the model with mock functions
-class EchoModelWithTokenizer(ModelAdapter):
+class EchoModel(ModelAdapter):
 
     name: str = "EchoModel"
-    model_local_path_for_tokenizer: str|None = MODEL_PATH
-
 
     async def generate(self, messages, max_tokens=100, temperature=0.7):
         return await mirror_generate(generate_prompt_text_from_messages(messages))

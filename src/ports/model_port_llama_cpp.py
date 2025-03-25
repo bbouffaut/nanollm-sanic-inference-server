@@ -1,7 +1,6 @@
 
 from llama_cpp import Llama
-from src.constants import MODEL_FILE, MODEL_PATH
-from src.model_adapter import ModelAdapter
+from src.adapters.model_adapter import ModelAdapter
 
 
 def llama_cpp_generate(messages, llm, temperature):
@@ -35,10 +34,9 @@ def generate_prompt(messages):
 class LlamaCppModel(ModelAdapter):
 
     name: str = "LlamaCppModel"
-    model_local_path_for_tokenizer: str|None = MODEL_PATH
 
-    def __init__(self):
-        self.llm = Llama(model_path=MODEL_PATH + "/" + MODEL_FILE, chat_format="chatml", n_gpu_layers=-1)
+    def __init__(self, model_path: str):
+        self.llm = Llama(model_path=model_path, chat_format="chatml", n_gpu_layers=-1)
 
     async def generate(self, messages, max_tokens=100, temperature=0.7):
         return llama_cpp_generate(messages, self.llm, temperature)

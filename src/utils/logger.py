@@ -1,6 +1,6 @@
 import logging
 
-from src.constants import LOGGING_LEVEL
+from src.utils.constants import LOGGING_LEVEL
 
 # Create a logger
 logger = logging.getLogger(__name__)

@@ -2,10 +2,10 @@
 import asyncio
 import json
 
-from src.model_adapter import ModelAdapter
+from src.adapters.model_adapter import ModelAdapter
 
 
-with open('./src/mock_responses.json', 'r') as f:
+with open('./data/mock_responses.json', 'r') as f:
     MOCK_DATA = json.load(f)
 
 async def mock_generate():

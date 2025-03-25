@@ -1,7 +1,11 @@
-# launch sanic server in dev mode
-launch_sanic_server_in_dev_mode:
-	export ENV_FILE_PATH=./config/.env && sanic llama_cpp_server:app --dev
+llama-server-gemma2:
+	export ENV_FILE_PATH=./config/.env && sanic src.apps.llama_cpp_server:app --dev --model=gemma-2-2b-it-GGUF/gemma-2-2b-it-Q4_K_M.gguf
 
-# launch sanic server in prod mode (single process)
-launch_sanic_server_in_prod_mode:
-	export ENV_FILE_PATH=./config/.env && sanic llama_cpp_server:app --single-process
+echo-server:
+	export ENV_FILE_PATH=./config/.env && sanic src.apps.echo_server:app --dev
+
+echo-server-with-tokenizer:
+	export ENV_FILE_PATH=./config/.env && sanic src.apps.echo_server_with_tpkenizer:app --dev
+
+mock-server:
+	export ENV_FILE_PATH=./config/.env && sanic src.apps.mock_server:app --dev

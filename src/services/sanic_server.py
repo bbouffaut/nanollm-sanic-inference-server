@@ -1,8 +1,8 @@
 import asyncio
 from sanic import Sanic
 
-from src.model_adapter import ModelAdapter
-from src.openai_v1_blueprint import openai_v1_bp
+from src.adapters.model_adapter import ModelAdapter
+from src.services.openai_v1_blueprint import openai_v1_bp
 
 
 def create_server(model_adapter: ModelAdapter) -> Sanic:

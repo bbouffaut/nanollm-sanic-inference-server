@@ -3,8 +3,8 @@ import time
 from sanic import Blueprint
 from sanic.response import json as response_json
 
-from src.logger import logger
-from src.openai_services import compute_usage_from_dict, compute_usage_from_text
+from src.utils.logger import logger
+from src.services.openai_services import compute_usage_from_dict, compute_usage_from_text
 
 
 openai_v1_bp = Blueprint('openai', url_prefix = '/v1')

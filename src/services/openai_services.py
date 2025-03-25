@@ -1,5 +1,5 @@
-from src.logger import logger
-from src.model_adapter import ModelAdapter
+from src.utils.logger import logger
+from src.adapters.model_adapter import ModelAdapter
 from transformers import AutoTokenizer
 
 def generate_prompt_text_from_messages(messages):
