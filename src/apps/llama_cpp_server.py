@@ -2,20 +2,18 @@ import argparse
 import os
 from pathlib import Path
 
+from sanic import Sanic
+
 from src.adapters.model_adapter import ModelAdapter
 from src.ports.model_port_llama_cpp import LlamaCppModel
 from src.services.sanic_server import create_server
 from src.utils.constants import MODEL_PATH
 
 
-def llama_cpp_server():
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Launch LlamaCpp model server')
-    parser.add_argument('--model', type=str, help='Name of the model file to use', required=True)
-    args = parser.parse_args()
+def create_app(model_path: str) -> Sanic:
 
     # Set model path
-    model_file_path = os.path.join(MODEL_PATH, args.model)
+    model_file_path = os.path.join(MODEL_PATH, model_path)
     
     # Ensure the model file exists
     if not Path(model_file_path).exists():
@@ -29,5 +27,15 @@ def llama_cpp_server():
     app = create_server(llama_cpp_model)
     return app
 
+def main():
+    parser = argparse.ArgumentParser(description="LLaMA CPP Server")
+    parser.add_argument("--model_path", type=str, help="Path to the model file")
+    args = parser.parse_args()
 
-app = llama_cpp_server()
+    app = create_app(args.model_path)
+    return app
+
+app = main()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000)

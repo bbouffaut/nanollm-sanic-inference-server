@@ -34,6 +34,7 @@ def generate_prompt(messages):
 class LlamaCppModel(ModelAdapter):
 
     name: str = "LlamaCppModel"
+    has_arguments: bool = True
 
     def __init__(self, model_path: str):
         self.llm = Llama(model_path=model_path, chat_format="chatml", n_gpu_layers=-1)
