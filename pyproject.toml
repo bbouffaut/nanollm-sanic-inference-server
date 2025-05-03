@@ -1,14 +1,14 @@
 [project]
 name = "nanollm-sanic-inference-server"
 version = "0.1.0"
-description = "Add your description here"
+description = "LLM server with OpenAI interface running different backend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "asyncio>=3.4.3",
-    "llama-cpp-python>=0.3.8",
+    "llama-cpp-python>=0.2.90",
     "nanollm>=0.1",
     "sanic>=25.3.0",
-    "torch>=2.7.0",
+    "torch>=2.4.0",
     "transformers>=4.51.3",
 ]
