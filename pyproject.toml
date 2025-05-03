@@ -1,0 +1,12 @@
+[project]
+name = "nanollm-sanic-inference-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncio>=3.4.3",
+    "nanollm>=0.1",
+    "sanic>=25.3.0",
+    "transformers>=4.51.3",
+]

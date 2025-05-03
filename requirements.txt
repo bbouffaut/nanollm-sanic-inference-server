@@ -1,4 +1,0 @@
-sanic
-nanollm
-asyncio
-transformers
