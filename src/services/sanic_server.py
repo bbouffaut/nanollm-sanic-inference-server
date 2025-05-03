@@ -10,19 +10,21 @@ from src.utils.constants import MODEL_FILE, MODEL_PATH
 
 
 def create_server() -> Sanic:
+
+    model_file_path = os.path.join(MODEL_PATH, MODEL_FILE)
+    # Ensure the model file exists
+    if not Path(model_file_path).exists():
+        logger.error(f"Error: Model file not found at {model_file_path}")
+        exit(1)
     
-    app = Sanic()
+    app = Sanic(name=model_file_path)
     bp = openai_v1_bp
     app.blueprint(bp)
 
     # Set mock model in app context
     @app.before_server_start
     async def setup_model(app):
-        model_file_path = os.path.join(MODEL_PATH, MODEL_FILE)
-        # Ensure the model file exists
-        if not Path(model_file_path).exists():
-            logger.error(f"Error: Model file not found at {model_file_path}")
-            exit(1)
+        
         
         # Initialize the model with the specified path
         llama_cpp_model: ModelAdapter = LlamaCppModel(model_path=model_file_path)
