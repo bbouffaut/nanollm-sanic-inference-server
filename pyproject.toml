@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "asyncio>=3.4.3",
+    "langchain>=0.3.25",
+    "langchain-llm>=0.4.15",
     "llama-cpp-python>=0.2.90",
     "nanollm>=0.1",
     "sanic>=25.3.0",

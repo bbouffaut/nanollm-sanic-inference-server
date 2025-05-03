@@ -1,4 +1,5 @@
-FROM dustynv/nano_llm:24.5-r36.2.0
+#FROM dustynv/nano_llm:24.5-r36.2.0
+FROM llamacpp:r36.4.3-llama_cpp
 
 USER root
 RUN apt update && apt install -y vim
