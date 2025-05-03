@@ -9,6 +9,17 @@ from src.utils.logger import logger
 from src.utils.constants import MODEL_FILE, MODEL_PATH
 
 
+def create_name(model_file_path):
+    # Get the file name from the model file path
+    file_name = os.path.basename(model_file_path)
+    # Remove the file extension
+    file_name = os.path.splitext(file_name)[0]
+    # Replace underscores with spaces
+    file_name = file_name.replace("_", " ")
+    # Capitalize the first letter of each word
+    file_name = " ".join([word.capitalize() for word in file_name.split()])
+    return file_name
+
 def create_server() -> Sanic:
 
     model_file_path = os.path.join(MODEL_PATH, MODEL_FILE)
@@ -16,8 +27,11 @@ def create_server() -> Sanic:
     if not Path(model_file_path).exists():
         logger.error(f"Error: Model file not found at {model_file_path}")
         exit(1)
+
+    name = create_name(model_file_path)
+    logger.info(f"Creating server with name: {name}")
     
-    app = Sanic(name=model_file_path)
+    app = Sanic(name=name)
     bp = openai_v1_bp
     app.blueprint(bp)
 
