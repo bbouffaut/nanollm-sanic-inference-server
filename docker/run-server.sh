@@ -1,0 +1,2 @@
+jetson-containers run -it --rm --name nanollm-server-local-dev -p 10000:10000 -v /ssd/models:/models -v /ssd/1-workspace:/workspace -v /ssd/z-dev_env/root:/root nanollm-sanic-inference-server-local-dev:0.1-arm64 
+# docker run -it --rm --name nanollm-server-local-dev -p 10000:10000 -v /ssd/models:/models -v /ssd/1-workspace:/workspace -v /ssd/z-dev_env/root:/root nanollm-sanic-inference-server-local-dev:0.1-arm64 
