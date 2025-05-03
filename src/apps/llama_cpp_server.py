@@ -1,4 +1,3 @@
-import argparse
 import os
 from pathlib import Path
 
@@ -7,13 +6,10 @@ from sanic import Sanic
 from src.adapters.model_adapter import ModelAdapter
 from src.ports.model_port_llama_cpp import LlamaCppModel
 from src.services.sanic_server import create_server
-from src.utils.constants import MODEL_PATH
+from src.utils.constants import MODEL_FILE, MODEL_PATH
 
 
-def create_app(model_path: str) -> Sanic:
-
-    # Set model path
-    model_file_path = os.path.join(MODEL_PATH, model_path)
+def create_app(model_file_path: str) -> Sanic:
     
     # Ensure the model file exists
     if not Path(model_file_path).exists():
@@ -28,11 +24,11 @@ def create_app(model_path: str) -> Sanic:
     return app
 
 def main():
-    parser = argparse.ArgumentParser(description="LLaMA CPP Server")
-    parser.add_argument("--model_path", type=str, help="Path to the model file")
-    args = parser.parse_args()
 
-    app = create_app(args.model_path)
+ # Set model path
+    model_file_path = os.path.join(MODEL_PATH, MODEL_FILE)
+
+    app = create_app(model_file_path)
     return app
 
 app = main()
