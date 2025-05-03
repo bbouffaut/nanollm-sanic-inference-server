@@ -1,7 +1,7 @@
 
 from llama_cpp import Llama
 from src.adapters.model_adapter import ModelAdapter
-from src.utils import logger
+from src.utils.logger import logger
 
 
 def llama_cpp_generate(messages, llm, temperature):
