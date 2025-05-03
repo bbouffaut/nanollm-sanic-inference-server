@@ -1,5 +1,5 @@
 llama-server-gemma2:
-	export ENV_FILE_PATH=./config/.env && PYTHONPATH=. uv run -m sanic src.apps.llama_cpp_server:app --port=10000
+	export ENV_FILE_PATH=./config/.env && PYTHONPATH=. uv run -m sanic src.apps.llama_cpp_server:app --port=10000 --workers=1 --auto_reload=False --access_log=False
 
 echo-server:
 	export ENV_FILE_PATH=./config/.env && PYTHONPATH=. uv run -m sanic src.apps.echo_server:app --dev --port=10000
