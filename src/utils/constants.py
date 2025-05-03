@@ -16,5 +16,3 @@ DEFAULT_MODEL_FILE = "model.gguf"
 MODEL_FILE = os.getenv("MODEL_FILE", DEFAULT_MODEL_FILE)
 
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
-
-SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
