@@ -7,7 +7,7 @@ from sanic import Sanic
 from src.adapters.model_adapter import ModelAdapter
 from src.ports.model_port_llama_cpp import LlamaCppModel
 from src.services.sanic_server import create_server
-from src.utils.constants import MODEL_PATH
+from src.utils.constants import LOGGING_LEVEL, MODEL_PATH, SERVER_PORT
 
 
 def create_app(model_path: str) -> Sanic:
@@ -37,5 +37,4 @@ def main():
 
 app = main()
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+# app.run(host="0.0.0.0", port=SERVER_PORT, debug=(LOGGING_LEVEL == "DEBUG"))
