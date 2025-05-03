@@ -14,10 +14,8 @@ def create_name(model_file_path):
     file_name = os.path.basename(model_file_path)
     # Remove the file extension
     file_name = os.path.splitext(file_name)[0]
-    # Replace underscores with spaces
-    file_name = file_name.replace("_", " ")
-    # Capitalize the first letter of each word
-    file_name = " ".join([word.capitalize() for word in file_name.split()])
+    # Replace spaces with underscores
+    file_name = file_name.replace(" ", "_")
     return file_name
 
 def create_server() -> Sanic:
