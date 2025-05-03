@@ -9,9 +9,9 @@ from src.utils.logger import logger
 from src.utils.constants import MODEL_FILE, MODEL_PATH
 
 
-def create_server(model_adapter: ModelAdapter) -> Sanic:
+def create_server() -> Sanic:
     
-    app = Sanic(model_adapter.name)
+    app = Sanic()
     bp = openai_v1_bp
     app.blueprint(bp)
 
