@@ -12,15 +12,28 @@ none_v1_bp = Blueprint('none', url_prefix = '/v1')
 async def get_embeddings(request):
     app = request.app
     data = request.json
-
+    messages = data.get("messages", [])
    
     try:
-        response = await request.respond(content_type="json")
 
-        await response.send("data: [DONE]\n\n")
+        usage: dict = {}
+        choices: dict = {}
+
+        response_from_llm: str = await app.ctx.model.generate(
+            messages,
+            max_tokens=data.get("max_tokens", 100),
+            temperature=data.get("temperature", 0.7)
+        )
+        
+        completion_response = {
+           "response": response_from_llm
+        }
+
+        logger.info(f'Response: {completion_response}')
+        
+        return response_json(completion_response)
     
     except Exception as e:
-        await response.send(f"data: {json.dumps({'error': str(e)})}\n\n")
+
+        return response_json({"error": str(e)}, status=500)
     
-    finally:
-        await response.eof()
