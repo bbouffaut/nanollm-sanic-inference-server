@@ -11,12 +11,13 @@ def create_model_instance(model_info: ModelInfo) -> ModelAdapter:
     :param model_info: An object containing 'name' and 'params' for the model.
     :return: An instance of ModelAdapter.
     """
-    model_name = model_info.get('name')
-    model_params = model_info.get('params', {})
+    model_name = model_info.name
+    model_params = model_info.params
 
     model_class = MODEL_CLASSES.get(model_name)
     if model_class is None:
         logger.error(f"Model '{model_name}' is not supported.")
         raise ValueError(f"Model '{model_name}' is not supported.")
 
+    logger.info(f"Creating model instance for {model_name} with params: {model_params}")
     return model_class(**model_params)

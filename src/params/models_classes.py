@@ -4,15 +4,19 @@ from src.ports.model_port_llama_cpp import LlamaCppModel
 from src.ports.model_port_mock import MockModel
 
 
-MODEL_CLASSES = {
-    'LlamaCppModel': LlamaCppModel,
-    'EchoModelWithTokenizer': EchoModelWithTokenizer,
-    'EchoModel': EchoModel,
-    'MockModel': MockModel
-    
-}
+class ModelClasses:
+    LlamaCppModel = LlamaCppModel
+    EchoModelWithTokenizer = EchoModelWithTokenizer
+    EchoModel = EchoModel
+    MockModel = MockModel
 
-MODEL_TYPES = {
-    'CHAT_COMPLETION': 'CHAT_COMPLETION',
-    'EMBEDDINGS': 'EMBEDDINGS'
-}
+    def get(self, name, default=None):
+        return getattr(self, name, default)
+    
+MODEL_CLASSES = ModelClasses()
+
+class ModelTypes:
+    CHAT_COMPLETION = 'CHAT_COMPLETION'
+    EMBEDDINGS = 'EMBEDDINGS'
+
+MODEL_TYPES = ModelTypes()

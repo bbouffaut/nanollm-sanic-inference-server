@@ -1,19 +1,23 @@
 {
     "llama-server-gemma2": {
+        "type": "CHAT_COMPLETION",
         "name": "LlamaCppModel",
         "params": {
             "model_path": "Users/baptiste/.cache/lm-studio/models/lmstudio-community/gemma-2-2b-it-GGUF/gemma-2-2b-it-Q3_K_L.gguf"
         }
     },
     "echo-server-with-tokenizer": {
+        "type": "NONE",
         "name": "EchoModelWithTokenizer",
         "params": {}
     },
     "echo-server": {
+        "type": "NONE",
         "name": "EchoModel",
         "params": {}
     },
     "mock-server": {
+        "type": "NONE",
         "name": "MockModel",
         "params": {}
     }

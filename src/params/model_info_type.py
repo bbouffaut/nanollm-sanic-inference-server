@@ -5,7 +5,7 @@ from typing import Any, Dict, Literal
 class ModelInfo:
     name: str
     params: Dict[str, Any]
-    type: Literal['CHAT_COMPLETION', 'EMBEDDINGS']
+    type: Literal['CHAT_COMPLETION', 'EMBEDDINGS', "NONE"]
 
 def from_json(json_input: Dict[str, Any]) -> ModelInfo:
     """Maps a JSON input to a ModelInfo instance."""

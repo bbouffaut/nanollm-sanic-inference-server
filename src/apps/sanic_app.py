@@ -1,4 +1,5 @@
 import json
+import os
 from sanic import Sanic
 from src.params.model_info_type import ModelInfo
 from src.services.sanic_server import create_server
@@ -18,11 +19,16 @@ def get_model_info_from_id(params_id: str) -> ModelInfo:
         raise KeyError(f"Model parameters for '{params_id}' not found.")
 
 
-def create_app(params_id: str) -> Sanic:
+def create_app() -> Sanic:
+
+    params_id: str = os.getenv('MODEL_PARAMS_ID')
 
     params: ModelInfo = get_model_info_from_id(params_id)
     logger.info(f"Creating app with ModelInfo: {json.dumps(params.__dict__)}")
 
-    app = create_server(params)
+    app: Sanic = create_server(params)
+    logger.debug(f'App created with name: {app.name}')
 
     return app
+
+app = create_app()
