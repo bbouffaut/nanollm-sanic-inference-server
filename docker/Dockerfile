@@ -14,4 +14,4 @@ WORKDIR /nanollm-sanic-inference-server
 RUN /bin/bash -c "source .venv/bin/activate"
 RUN CUDACXX=/usr/local/cuda/bin/nvcc CMAKE_ARGS="-DGGML_CUDA=on -DCMAKE_CUDA_ARCHITECTURES=all-major" uv run pip install llama-cpp-python --no-cache-dir --force-reinstall --upgrade
 
-EXPOSE 10000
+EXPOSE 9010
