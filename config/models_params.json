@@ -1,0 +1,20 @@
+[
+    {
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": ""
+        }
+    },
+    {
+        "name": "EchoModelWithTokenizer",
+        "params": {}
+    },
+    {
+        "name": "EchoModel",
+        "params": {}
+    },
+    {
+        "name": "MockModel",
+        "params": {}
+    }
+]
