@@ -1,0 +1,24 @@
+{
+    "llama-server-gemma2": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/gemma-2-2b-it-Q3_K_L.gguf"
+        }
+    },
+    "echo-server-with-tokenizer": {
+        "type": "NONE",
+        "name": "EchoModelWithTokenizer",
+        "params": {}
+    },
+    "echo-server": {
+        "type": "NONE",
+        "name": "EchoModel",
+        "params": {}
+    },
+    "mock-server": {
+        "type": "NONE",
+        "name": "MockModel",
+        "params": {}
+    }
+}
