@@ -1,4 +1,7 @@
-# PUT VIRTUAL_ENV into config/.env file to be loaded as an env variable
+# /!\ CREATE a .venv folder by:
+# 1 - Running uv venv && uv sync
+# 2 - Copying a .venv folder from somewhere else (jetson-nanao container image as an example)
+
 llama-server-gemma2:
 	export ENV_FILE_PATH=./config/.env && PYTHONPATH=. MODEL_PARAMS_ID='llama-server-gemma2' uv run -m sanic src.apps.sanic_app:app --port=9010 --workers=1
 
