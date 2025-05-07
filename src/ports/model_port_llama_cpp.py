@@ -41,7 +41,7 @@ class LlamaCppModel(ModelAdapter):
         import traceback
         self.llm = Llama(model_path=model_path, chat_format="chatml", n_gpu_layers=-1)
         logger.info(f"Initialized LlamaCppModel with model path: {model_path}")
-        traceback.print_stack()  # Show where it's being called from
+        # traceback.print_stack()  # Show where it's being called from
 
     async def generate(self, messages, max_tokens=100, temperature=0.7):
         return llama_cpp_generate(messages, self.llm, temperature)
