@@ -1,6 +1,7 @@
 
 from llama_cpp import Llama
 from src.adapters.model_adapter import ModelAdapter
+from src.types.model_info_type import ModelParams
 from src.utils.logger import logger
 
 
@@ -37,10 +38,12 @@ class LlamaCppModel(ModelAdapter):
     name: str = "LlamaCppModel"
     has_arguments: bool = True
 
-    def __init__(self, model_path: str):
-        import traceback
-        self.llm = Llama(model_path=model_path, chat_format="chatml", n_gpu_layers=-1)
-        logger.info(f"Initialized LlamaCppModel with model path: {model_path}")
+    def __init__(self, model_params: ModelParams):
+        model_path = model_params.path
+        #import traceback
+        n_gpu_layers = -1 if model_params.gpu else 0
+        self.llm = Llama(model_path=model_path, chat_format="chatml", n_gpu_layers=n_gpu_layers)
+        logger.info(f"Initialized LlamaCppModel with model path: {model_path} and gpu: {model_params.gpu}")
         # traceback.print_stack()  # Show where it's being called from
 
     async def generate(self, messages, max_tokens=100, temperature=0.7):
