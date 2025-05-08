@@ -4,7 +4,7 @@ from sanic import Sanic
 from src.params.model_info_type import ModelInfo
 from src.services.sanic_server import create_server
 from src.utils.logger import logger
-from src.utils.constants import MODELS_PARAMS_FILE
+from src.utils.constants import MODELS_PARAMS_FILE, PORT
 
 def get_model_info_from_id(params_id: str) -> ModelInfo:
 
@@ -32,3 +32,7 @@ def create_app() -> Sanic:
     return app
 
 app = create_app()
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=PORT)
+

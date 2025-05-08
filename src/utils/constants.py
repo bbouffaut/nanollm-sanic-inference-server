@@ -9,3 +9,4 @@ load_dotenv(ENV_FILE_PATH)
 
 MODELS_PARAMS_FILE = os.getenv("MODELS_PARAMS_FILE", {})
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
+PORT=int(os.getenv("PORT", 8000))
