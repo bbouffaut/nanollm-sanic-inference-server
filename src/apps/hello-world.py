@@ -10,4 +10,4 @@ async def hello_world(request):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=PORT)
+    app.run(host='0.0.0.0', port=PORT, debug=False, access_log=False, workers=1)

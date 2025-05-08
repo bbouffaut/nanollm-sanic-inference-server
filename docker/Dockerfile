@@ -12,4 +12,5 @@ WORKDIR /root
 RUN /bin/bash -c "uv venv venv-3.12-llama_cpp-CUDA --python 3.12"
 RUN /bin/bash -c "source venv-3.12-llama_cpp-CUDA/bin/activate"
 
-RUN CUDACXX=/usr/local/cuda/bin/nvcc CMAKE_ARGS="-DGGML_CUDA=on -DCMAKE_CUDA_ARCHITECTURES=all-major" VIRTUAL_ENV=/root/venv-3.12-llama_cpp-CUDA uv pip install llama-cpp-python --no-cache-dir --force-reinstall --upgrade
+# https://github.com/abetlen/llama-cpp-python/issues/1779#issuecomment-2396550099
+RUN CUDACXX=/usr/local/cuda/bin/nvcc CMAKE_ARGS="-DGGML_CUDA=on" FORCE_CMAKE=1 VIRTUAL_ENV=/root/venv-3.12-llama_cpp-CUDA uv pip install llama-cpp-python --no-cache-dir --force-reinstall --upgrade
