@@ -17,3 +17,9 @@ mock-server:
 hello-world:
 	PYTHONPATH=. uv run -m src.apps.hello-world
 
+test-cuda:
+	uv run tests/test-cuda.py
+
+test-cuda-llama-cpp:
+	uv run tests/test-cuda-llama-cpp.py
+
