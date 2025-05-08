@@ -3,7 +3,7 @@ from typing import Any, Dict, Literal
 
 @dataclass
 class ModelParams:
-    path: str
+    model_path: str
     gpu: bool
 
 @dataclass
