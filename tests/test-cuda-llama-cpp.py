@@ -19,4 +19,7 @@ response = llm.create_chat_completion(
     stream=True
 )
 for chunk in response:
-    print(chunk['choices'][0]['text'].split('[/INST]')[-1])
+    # print(chunk['choices'][0]['text'].split('[/INST]')[-1])
+    if 'content' in chunk['choices'][0]['delta']:
+        print(chunk['choices'][0]['delta']['content'])
+
