@@ -1,7 +1,7 @@
 import json
 import os
 from sanic import Sanic
-from src.params.model_info_type import ModelInfo
+from src.types.model_info_type import ModelInfo
 from src.services.sanic_server import create_server
 from src.utils.logger import logger
 from src.utils.constants import MODELS_PARAMS_FILE, PORT

@@ -1,6 +1,6 @@
-from src.params.models_classes import MODEL_CLASSES
+from src.types.models_classes import MODEL_CLASSES
 from src.adapters.model_adapter import ModelAdapter
-from src.params.model_info_type import ModelInfo
+from src.types.model_info_type import ModelInfo
 from src.utils.logger import logger
 
 

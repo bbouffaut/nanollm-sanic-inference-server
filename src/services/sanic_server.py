@@ -2,9 +2,9 @@ import os
 from pathlib import Path
 from sanic import Sanic
 
-from src.params.models_classes import MODEL_TYPES
+from src.types.models_classes import MODEL_TYPES
 from src.ports.models_port_generator import create_model_instance
-from src.params.model_info_type import ModelInfo
+from src.types.model_info_type import ModelInfo
 from src.adapters.model_adapter import ModelAdapter
 from src.sanic_blueprints.openai_v1_blueprint import openai_v1_bp
 from src.sanic_blueprints.embeddings_v1_blueprint import embeddings_v1_bp
