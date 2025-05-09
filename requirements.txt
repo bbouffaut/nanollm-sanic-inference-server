@@ -1,8 +1,8 @@
 asyncio>=3.4.3
 langchain-llm>=0.4.15
 langchain>=0.3.25
-llama-cpp-python>=0.2.90
 nanollm>=0.1
 sanic>=25.3.0
 torch>=2.4.0
 transformers>=4.51.3
+llama-cpp-python>=0.3.8
