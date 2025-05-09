@@ -1,7 +1,6 @@
 
 from llama_cpp import Llama
 from src.adapters.model_adapter import ModelAdapter
-from src.types.model_info_type import ModelParams
 from src.utils.logger import logger
 
 

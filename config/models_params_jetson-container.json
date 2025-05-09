@@ -15,6 +15,14 @@
             "gpu": "True"
         }
     },
+    "nanollm-server-gemma2": {
+        "type": "CHAT_COMPLETION",
+        "name": "NanoLlmModel",
+        "params": {
+            "model_path": "/data/models/huggingface/gemma-2-2b-it-Q3_K_L.gguf",
+            "gpu": "True"
+        }
+    },
     "echo-server-with-tokenizer": {
         "type": "NONE",
         "name": "EchoModelWithTokenizer",
