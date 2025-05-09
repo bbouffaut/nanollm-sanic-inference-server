@@ -2,7 +2,7 @@
 # FROM llamacpp:r36.4.3-llama_cpp
 # BUILD llamacpp:r36.4.3-llama_cpp this image with: 
 # jetson-containers build --name=llamacpp triton llama_cpp
-FROM  dustynv/nano_llm:r36.2.0
+FROM  dustynv/nano_llm:r36.4.0
 
 USER root
 # https://forums.developer.nvidia.com/t/libopenblas-so-0-not-found/264406
@@ -14,6 +14,15 @@ RUN apt update && apt install -y vim && apt install -y libopenblas-dev
 
 RUN wget https://pypi.jetson-ai-lab.dev/jp6/cu126/+f/213/c44ff20e1dd8a/llama_cpp_python-0.3.8-cp310-cp310-linux_aarch64.whl#sha256=213c44ff20e1dd8ad3ed84f9a0a6e8f2a032df4dabaeb8ae19a611d9e59cfe5b
 RUN pip install llama_cpp_python-0.3.8-cp310-cp310-linux_aarch64.whl
+
+RUN wget https://pypi.jetson-ai-lab.dev/jp6/cu126/+f/6ef/f643c0a7acda9/torch-2.7.0-cp310-cp310-linux_aarch64.whl#sha256=6eff643c0a7acda92734cc798338f733ff35c7df1a4434576f5ff7c66fc97319
+RUN pip install torch-2.7.0-cp310-cp310-linux_aarch64.whl
+
+RUN wget https://pypi.jetson-ai-lab.dev/jp6/cu126/+f/daa/bff3a07259968/torchvision-0.22.0-cp310-cp310-linux_aarch64.whl#sha256=daabff3a0725996886b92e4b5dd143f5750ef4b181b5c7d01371a9185e8f0402
+RUN pip install torchvision-0.22.0-cp310-cp310-linux_aarch64.whl
+
+RUN wget https://pypi.jetson-ai-lab.dev/jp6/cu126/+f/c59/026d500c57366/torchaudio-2.7.0-cp310-cp310-linux_aarch64.whl#sha256=c59026d500c573666ae0437c4202ac312ac8ebe38fa12dbb37250a07c1e826f9
+RUN pip install torchaudio-2.7.0-cp310-cp310-linux_aarch64.whl
 
 COPY . /nanollm-sanic-inference-server
 WORKDIR /nanollm-sanic-inference-server
