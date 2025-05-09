@@ -7,6 +7,14 @@
             "gpu": "True"
         }
     },
+    "llama-server-gemma3": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/gemma-3-4b-it-Q4_K_M.gguf",
+            "gpu": "True"
+        }
+    },
     "echo-server-with-tokenizer": {
         "type": "NONE",
         "name": "EchoModelWithTokenizer",
