@@ -1,0 +1,59 @@
+
+from llama_cpp import Llama
+from src.adapters.model_adapter import ModelAdapter
+from src.types.model_info_type import ModelParams
+from src.utils.logger import logger
+from nano_llm import NanoLLM
+
+
+def llama_cpp_generate(messages, llm, temperature):
+    response = llm.create_chat_completion(
+        messages=messages,
+        temperature=temperature,
+        stream=False
+    )
+    print(f'Response: {response}')
+    return response
+    
+
+async def llama_cpp_generate_stream(messages, llm, temperature):
+    response = llm.create_chat_completion(
+        messages=messages,
+        temperature=temperature,
+        stream=True
+    )
+    for chunk in response:
+        yield chunk
+    
+
+def generate_prompt(messages):
+    prompt = ""
+    for msg in messages:
+        role = msg.get("role", "user")
+        content = msg.get("content", "")
+        prompt += f"{role}: {content}\n"
+    return prompt
+# Replace the model with mock functions
+class NanoLlm(ModelAdapter):
+
+    name: str = "NanoLlmModel"
+    has_arguments: bool = True
+
+    def __init__(self, model_path: str, gpu: bool):
+        #import traceback
+        n_gpu_layers = -1 if gpu else 0
+        self.llm = # load model
+            model = NanoLLM.from_pretrained(
+            model=model_path, 
+            quantization='q4f16_ft', 
+            api='mlc'
+        )
+        logger.info(f"Initialized LlamaCppModel with model path: {model_path} and gpu: {gpu}")
+        # traceback.print_stack()  # Show where it's being called from
+
+    async def generate(self, messages, max_tokens=100, temperature=0.7):
+        return llama_cpp_generate(messages, self.llm, temperature)
+    
+    async def generate_stream(self, messages, max_tokens=100, temperature=0.7):
+        async for chunk in llama_cpp_generate_stream(messages, self.llm, temperature):
+            yield chunk

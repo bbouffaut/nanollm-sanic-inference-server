@@ -1,7 +1,8 @@
 #FROM dustynv/nano_llm:24.5-r36.2.0
-FROM llamacpp:r36.4.3-llama_cpp
+# FROM llamacpp:r36.4.3-llama_cpp
 # BUILD llamacpp:r36.4.3-llama_cpp this image with: 
-# jetson-containers build --name=llamacpp llama_cpp
+# jetson-containers build --name=llamacpp triton llama_cpp
+FROM  dustynv/nano_llm:r36.2.0
 
 USER root
 # https://forums.developer.nvidia.com/t/libopenblas-so-0-not-found/264406
