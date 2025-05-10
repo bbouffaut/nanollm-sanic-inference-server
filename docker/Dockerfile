@@ -2,6 +2,8 @@
 # FROM llamacpp:r36.4.3-llama_cpp
 # BUILD llamacpp:r36.4.3-llama_cpp this image with: 
 # jetson-containers build --name=llamacpp triton llama_cpp
+
+# https://hub.docker.com/u/dustynv
 FROM  dustynv/llama_cpp:r36.4.0
 
 USER root
@@ -16,6 +18,7 @@ RUN pip install torch
 RUN pip install torchvision
 RUN pip install torchaudio
 RUN pip install mlc_llm
+RUN pip install tvm
 
 RUN pip uninstall --yes transformers
 RUN pip install transformers
