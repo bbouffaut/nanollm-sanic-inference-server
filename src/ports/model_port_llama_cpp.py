@@ -44,9 +44,9 @@ class LlamaCppModel(ModelAdapter):
         logger.info(f"Initialized LlamaCppModel with model path: {model_path} and gpu: {gpu}")
         # traceback.print_stack()  # Show where it's being called from
 
-    async def generate(self, messages, max_tokens=100, temperature=0.7):
+    async def generate(self, messages, temperature=0.7):
         return llama_cpp_generate(messages, self.llm, temperature)
     
-    async def generate_stream(self, messages, max_tokens=100, temperature=0.7):
+    async def generate_stream(self, messages, temperature=0.7):
         async for chunk in llama_cpp_generate_stream(messages, self.llm, temperature):
             yield chunk

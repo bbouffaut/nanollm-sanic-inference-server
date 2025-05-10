@@ -8,6 +8,9 @@ llama-server-gemma2:
 llama-server-gemma3:
 	ENV_FILE_PATH=./config/.env MODEL_PARAMS_ID='llama-server-gemma3' python3 -m src.apps.sanic_app
 
+mlc-server-gemma2:
+	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-gemma2' python3 -m src.apps.sanic_app
+
 echo-server:
 	ENV_FILE_PATH=./config/.env MODEL_PARAMS_ID='echo-server' python3 -m src.apps.sanic_app
 
@@ -26,10 +29,7 @@ test-cuda:
 test-cuda-llama-cpp:
 	python3 tests/test-cuda-llama-cpp.py
 
-test-nanollm-agent:
-	TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ python3 tests/test-nanollm-agent.py
-
-test-nanollm:
-	TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ python3 tests/test-nanollm.py
+test-mlc:
+	TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ python3 tests/test-mlc.py
 
 
