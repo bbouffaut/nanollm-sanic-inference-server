@@ -13,7 +13,7 @@ def TIME():
           
 # load the model   
 model = NanoLLM.from_pretrained(
-    model="meta-llama/Meta-Llama-3-8B-Instruct", 
+    model="google/gemma-2b-it", 
     api='hf'
 )
 
