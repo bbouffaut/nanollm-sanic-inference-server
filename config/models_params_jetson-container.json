@@ -19,19 +19,14 @@
         "type": "CHAT_COMPLETION",
         "name": "NanoLlmModel",
         "params": {
-            "model_path": "/data/models/huggingface/gemma-2b-it",
-            "gpu": "True"
+            "model_path": "/data/models/huggingface/gemma-2b-it"
         }
     },
     "nanollm-server-gemma2-hf": {
         "type": "CHAT_COMPLETION",
         "name": "NanoLlmModel",
         "params": {
-            "model_path": "google/gemma-2b-it",
-            "api": "hf",
-            "quantization": "/data/models/huggingface/hub/models--mlc-ai--gemma-2-2b-it-q4f16_1-MLC/snapshots/4f3984195840df4234e4e34c7904e63d40154190",
-            "gpu": "True"
-        }
+            "model_path": "google/gemma-2b-it"        }
     },
     "echo-server-with-tokenizer": {
         "type": "NONE",

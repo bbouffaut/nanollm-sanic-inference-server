@@ -14,8 +14,7 @@ def TIME():
 # load the model   
 model = NanoLLM.from_pretrained(
     model="meta-llama/Meta-Llama-3-8B-Instruct", 
-    quantization='q4f16_ft', 
-    api='mlc'
+    api='hf'
 )
 
 # create the chat history
