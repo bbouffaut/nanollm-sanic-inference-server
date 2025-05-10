@@ -15,6 +15,14 @@
             "gpu": "True"
         }
     },
+    "transformers-server-gemma2": {
+        "type": "CHAT_COMPLETION",
+        "name": "TransformersModel",
+        "params": {
+            "model_path": "google/gemma-2b-it",
+            "gpu": "True"
+        }
+    },
     "echo-server-with-tokenizer": {
         "type": "NONE",
         "name": "EchoModelWithTokenizer",
