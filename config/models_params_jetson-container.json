@@ -15,19 +15,6 @@
             "gpu": "True"
         }
     },
-    "nanollm-server-gemma2": {
-        "type": "CHAT_COMPLETION",
-        "name": "NanoLlmModel",
-        "params": {
-            "model_path": "/data/models/huggingface/gemma-2b-it"
-        }
-    },
-    "nanollm-server-gemma2-hf": {
-        "type": "CHAT_COMPLETION",
-        "name": "NanoLlmModel",
-        "params": {
-            "model_path": "google/gemma-2b-it"        }
-    },
     "echo-server-with-tokenizer": {
         "type": "NONE",
         "name": "EchoModelWithTokenizer",
