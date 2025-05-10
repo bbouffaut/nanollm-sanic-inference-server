@@ -24,6 +24,12 @@ RUN pip install torchvision-0.22.0-cp310-cp310-linux_aarch64.whl
 RUN wget https://pypi.jetson-ai-lab.dev/jp6/cu126/+f/c59/026d500c57366/torchaudio-2.7.0-cp310-cp310-linux_aarch64.whl#sha256=c59026d500c573666ae0437c4202ac312ac8ebe38fa12dbb37250a07c1e826f9
 RUN pip install torchaudio-2.7.0-cp310-cp310-linux_aarch64.whl
 
+RUN wget https://pypi.jetson-ai-lab.dev/jp6/cu126/+f/fef/4cf9841e7b48f/awq-0.1.0-py3-none-any.whl#sha256=fef4cf9841e7b48f6f9eb2a7b6589441c68ab42e1601ee1196f3ee95feb557c6
+RUN pip install awq-0.1.0-py3-none-any.whl
+
+RUN pip uninstall --yes transformers
+RUN pip install transformers
+
 COPY . /nanollm-sanic-inference-server
 WORKDIR /nanollm-sanic-inference-server
 

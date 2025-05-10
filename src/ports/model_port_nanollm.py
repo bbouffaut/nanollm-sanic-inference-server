@@ -37,16 +37,15 @@ class NanoLlmModel(ModelAdapter):
     name: str = "NanoLlmModel"
     has_arguments: bool = True
 
-    def __init__(self, model_path: str, gpu: bool):
-        #import traceback
-        n_gpu_layers = -1 if gpu else 0
-        self.llm = NanoLLM.from_pretrained(
-            model=model_path, 
-            quantization='q4f16_ft', 
-            api='mlc'
-        )
+    def __init__(self, model_path: str, gpu: bool, quantization: str, api: str = None):
+        # import traceback
         logger.info(f"Initialized NanoLlm with model path: {model_path} and gpu: {gpu}")
-        # traceback.print_stack()  # Show where it's being called from
+        self.llm = NanoLLM.from_pretrained(
+            model=model_path,
+            api=api,                   # supported APIs are: mlc, awq, hf
+            quantization=quantization
+        )
+       # traceback.print_stack()  # Show where it's being called from
 
     async def generate(self, messages, max_tokens=100, temperature=0.7):
         return nanollm_generate(messages, self.llm, temperature)

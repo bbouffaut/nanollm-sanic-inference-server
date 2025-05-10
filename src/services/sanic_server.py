@@ -1,6 +1,5 @@
-import os
-from pathlib import Path
 from sanic import Sanic
+from sanic.worker.manager import WorkerManager
 
 from src.types.models_classes import MODEL_TYPES
 from src.ports.models_port_generator import create_model_instance
@@ -9,6 +8,7 @@ from src.adapters.model_adapter import ModelAdapter
 from src.sanic_blueprints.openai_v1_blueprint import openai_v1_bp
 from src.sanic_blueprints.embeddings_v1_blueprint import embeddings_v1_bp
 from src.sanic_blueprints.none_v1_blueprint import none_v1_bp
+from src.utils.constants import SANIC_WORKER_STARTUP_THRESHOLD
 from src.utils.logger import logger
 
 
@@ -27,6 +27,8 @@ def create_server(model_info: ModelInfo) -> Sanic:
 
     
     app.blueprint(bp)
+
+    WorkerManager.THRESHOLD = SANIC_WORKER_STARTUP_THRESHOLD
 
     # Set mock model in app context
     @app.before_server_start
