@@ -32,3 +32,6 @@ test-cuda:
 test-cuda-llama-cpp:
 	python3 tests/test-cuda-llama-cpp.py
 
+test-nanollm-agent:
+	TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ python3 tests/test-nanollm-agent.py
+
