@@ -15,14 +15,6 @@
             "gpu": "True"
         }
     },
-    "mlc-server-gemma2": {
-        "type": "CHAT_COMPLETION",
-        "name": "MLCModel",
-        "params": {
-            "model_path": "HF://mlc-ai/gemma-2-2b-it-q4f16_1-MLC",
-            "gpu": "True"
-        }
-    },
     "echo-server-with-tokenizer": {
         "type": "NONE",
         "name": "EchoModelWithTokenizer",
