@@ -4,7 +4,7 @@
 # jetson-containers build --name=llamacpp triton llama_cpp
 
 # https://hub.docker.com/u/dustynv
-FROM  dustynv/nano_llm:r36.4.0
+FROM  dustynv/mlc:r36.4.0
 
 USER root
 # https://forums.developer.nvidia.com/t/libopenblas-so-0-not-found/264406

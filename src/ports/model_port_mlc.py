@@ -28,13 +28,14 @@ async def transformers_generate_stream(messages, llm, temperature):
 # Replace the model with mock functions
 class MLCModel(ModelAdapter):
 
-    name: str = "LlamaCppModel"
+    name: str = "MLCModel"
     has_arguments: bool = True
 
     def __init__(self, model_path: str, gpu: bool):
         device_map = 'cuda' if gpu else 'cpu'
         self.model = model_path
         self.engine = MLCEngine(model_path, mode='local', device=device_map)
+        logger.info(f'MLC Model instance created with params with {model_path}')
           
 
     async def generate_stream(self, messages):
