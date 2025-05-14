@@ -48,7 +48,8 @@ class MLCModel(ModelAdapter):
                 yield chunk 
         
     
-    async def generate(self, messages, max_tokens=100):
+    async def generate(self, messages, max_tokens=100, temperature=0.7):
+        logger.debug(f"MLC Generate with model {self.model} and messages {messages}")
         response = self.engine.chat.completions.create(
             messages=messages,
             model=self.model,

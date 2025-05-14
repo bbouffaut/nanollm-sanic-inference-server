@@ -23,6 +23,7 @@ async def chat_completions(request):
     messages = data.get("messages", [])
     stream = data.get("stream", False)
     include_usage = data.get("include_usage", False)
+    response_from_llm = {}
    
     # Process non-streaming response
     if not stream:
@@ -80,11 +81,11 @@ async def chat_completions(request):
             }
 
             logger.info(f'Response: {completion_response}')
-            
             return response_json(completion_response)
         
         except Exception as e:
 
+            logger.error(f'An Error happened processing {response_from_llm}: {str(e)}')
             return response_json({"error": str(e)}, status=500)
     
     # Streaming response

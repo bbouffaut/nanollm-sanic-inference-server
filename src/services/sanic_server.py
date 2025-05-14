@@ -31,8 +31,8 @@ def create_server(model_info: ModelInfo) -> Sanic:
     WorkerManager.THRESHOLD = SANIC_WORKER_STARTUP_THRESHOLD
 
     # Set mock model in app context
-    @app.before_server_start
-    async def setup_model(app):
+    @app.main_process_start
+    async def main_process_start(app):
         
         # Initialize the model with the specified path
         model_port: ModelAdapter = create_model_instance(model_info)
