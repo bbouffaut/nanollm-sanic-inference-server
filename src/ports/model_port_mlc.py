@@ -31,7 +31,7 @@ class MLCModel(ModelAdapter):
     name: str = "MLCModel"
     has_arguments: bool = True
 
-    def __init__(self, model_path: str, gpu: bool, model_lib: str):
+    def __init__(self, model_path: str, gpu: bool, model_lib: str = None):
         device_map = 'cuda' if gpu else 'cpu'
         self.model = model_path
         self.engine = MLCEngine(model_path, mode='local', device=device_map, model_lib=model_lib)
