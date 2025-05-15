@@ -1,3 +1,5 @@
 asyncio>=3.4.3
 sanic>=25.3.0
 dotenv>=0.9.9
+pydantic>=2.11.4
+shortuuid>=1.0.13

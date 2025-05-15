@@ -1,11 +1,12 @@
 
 from llama_cpp import Llama
 from src.adapters.model_adapter import ModelAdapter
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse
 from src.utils.logger import logger
 
 
 def llama_cpp_generate(messages, llm, max_tokens, temperature):
-    response = llm.create_chat_completion(
+    response: ChatCompletionResponse = llm.create_chat_completion(
         messages=messages,
         temperature=temperature,
         stream=False,
@@ -16,7 +17,7 @@ def llama_cpp_generate(messages, llm, max_tokens, temperature):
     
 
 async def llama_cpp_generate_stream(messages, llm, max_tokens, temperature):
-    response = llm.create_chat_completion(
+    response: ChatCompletionStreamResponse = llm.create_chat_completion(
         messages=messages,
         temperature=temperature,
         stream=True,

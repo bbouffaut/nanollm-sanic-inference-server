@@ -1,3 +1,5 @@
+from typing import Any, Dict, List, Optional
+from src.adapters.openai.openai_api_protocol import ChatCompletionMessage, ChatCompletionResponse, ChatCompletionResponseChoice, ChatToolCall, CompletionLogProbs, CompletionResponse, CompletionResponseChoice, CompletionUsage, LogProbs, LogProbsContent
 from src.utils.logger import logger
 from src.adapters.model_adapter import ModelAdapter
 from transformers import AutoTokenizer
@@ -55,15 +57,55 @@ def compute_usage_from_dict(messages: dict, response_from_llm: dict, model: Mode
 
     return usage
 
-def compute_usage_from_text(messages: dict, response_from_llm: str, model: ModelAdapter|None):
+def compute_usage_from_text(messages: dict, response_from_llm: str, model: ModelAdapter|None) -> CompletionUsage:
 
     logger.debug(f'compute_usage_from_text response_from_llm = {response_from_llm}')
 
     prompt_tokens = count_tokens_from_messages(messages, model)
     completion_tokens = count_tokens_from_text(response_from_llm, model)
-    usage = {
+    usage: CompletionUsage = CompletionUsage({
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
         "total_tokens": prompt_tokens + completion_tokens
-    }
+    })
     return usage
+
+
+def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
+    request_id: str,
+    model: str,
+    output_texts: List[str],
+    finish_reasons: List[str],
+    tool_calls_list: List[List[ChatToolCall]],
+    logprob_results: Optional[List[List[LogProbsContent]]],
+    use_function_calling: bool,
+    usage: Optional[Dict[str, Any]],
+) -> ChatCompletionResponse:
+    """Wrap the non-streaming chat completion results to ChatCompletionResponse instance."""
+    return ChatCompletionResponse(
+        id=request_id,
+        choices=[
+            ChatCompletionResponseChoice(
+                index=i,
+                finish_reason=finish_reasons[i],
+                message=(
+                    ChatCompletionMessage(role="assistant", content=output_text)
+                    if not use_function_calling or finish_reason == "error"
+                    else ChatCompletionMessage(
+                        role="assistant", tool_calls=tool_calls
+                    )
+                ),
+                logprobs=(
+                    LogProbs(content=logprob_results[i])
+                    if logprob_results is not None
+                    else None
+                ),
+            )
+            for i, (output_text, finish_reason, tool_calls) in enumerate(
+                zip(output_texts, finish_reasons, tool_calls_list)
+            )
+        ],
+        model=model,
+        system_fingerprint="",
+        usage=usage,
+    )

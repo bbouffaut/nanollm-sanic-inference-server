@@ -1,6 +1,6 @@
 
-from threading import Thread
 from src.adapters.model_adapter import ModelAdapter
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse
 from src.utils.logger import logger
 
 from mlc_llm import MLCEngine
@@ -24,6 +24,10 @@ async def transformers_generate_stream(messages, llm, temperature):
     )
     for chunk in response:
         yield chunk
+
+# Add this method to the MLCModel class
+
+
     
 # Replace the model with mock functions
 class MLCModel(ModelAdapter):
@@ -51,18 +55,16 @@ class MLCModel(ModelAdapter):
     
     async def generate(self, messages, max_tokens=100, temperature=0.7):
         logger.debug(f"MLC Generate with model {self.model} and messages {messages}")
-        response = self.engine.chat.completions.create(
+        response: ChatCompletionResponse = self.engine.chat.completions.create(
             messages=messages,
             model=self.model,
             stream=False,
         )
 
-        logger.debug(f"Response From LLM = {response.choices[0]}")
+        logger.debug(f"Response From LLM = {response}")
 
-        
-        return response.choices[0]
+        return response
     
     def close(self):
         self.engine.terminate()
-
         

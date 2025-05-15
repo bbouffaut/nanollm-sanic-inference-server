@@ -1,10 +1,9 @@
-import json
-import time
+from typing import List, Optional
 from sanic import Blueprint
-from sanic.response import json as response_json
 
-from src.utils.logger import logger
-from src.services.openai_services import compute_usage_from_dict, compute_usage_from_text
+from src.adapters.openai.openai_api_protocol import LogProbsContent
+from src.services.openai_services import wrap_chat_completion_response
+from src.utils.utils import random_uuid
 
 
 openai_v1_bp = Blueprint('openai', url_prefix = '/v1')
@@ -23,129 +22,60 @@ async def chat_completions(request):
     messages = data.get("messages", [])
     stream = data.get("stream", False)
     include_usage = data.get("include_usage", False)
-    response_from_llm = {}
+    request_id = f"chatcmpl-{random_uuid()}"
+
+    response_from_llm = await app.ctx.model.generate(
+        messages,
+        max_tokens=data.get("max_tokens", 100),
+        temperature=data.get("temperature", 0.7)
+    )
    
-    # Process non-streaming response
-    if not stream:
+    if stream:
 
-        try:
-
-            logger.info(f"Entering not-streamed response generation with usage {include_usage}")
-
-            usage: dict = {}
-            choices: dict = {}
-
-            response_from_llm = await app.ctx.model.generate(
-                messages,
-                max_tokens=data.get("max_tokens", 100),
-                temperature=data.get("temperature", 0.7)
-            )
-
-            if isinstance(response_from_llm, dict):
-
-                choices = response_from_llm.get('choices')
-                logger.debug(f'Response is Dict with choices = {choices}')
-
-                if include_usage:
-
-                    usage = compute_usage_from_dict(
-                        messages,
-                        response_from_llm,
-                        app.ctx.model
-                    )
-            
-            else:
-                
-                if include_usage:
-
-                    usage = compute_usage_from_text(
-                        messages,
-                        response_from_llm,
-                        app.ctx.model
-                    )
-                
-                choices = [{
-                    "index": 0,
-                    "message": {
-                        "role": "assistant",
-                        "content": response_from_llm
-                    },
-                    "finish_reason": "stop"
-                }]
-            
-            completion_response = {
-                "id": "chatcmpl-" + compute_message_hash(messages),
-                "object": "chat.completion",
-                "created": int(time.time()),
-                "model": app.ctx.model.name,
-                "choices": choices,
-                "usage": usage
-            }
-
-            logger.info(f'Response: {completion_response}')
-            return response_json(completion_response)
+        first_response = await anext(  # type: ignore  # pylint: disable=undefined-variable
+            response_from_llm
+        )
+        # Streaming response
+        response = await request.respond(content_type="text/event-stream")
         
-        except Exception as e:
+        response.headers["Cache-Control"] = "no-cache"
+        response.headers["Connection"] = "keep-alive"
 
-            logger.error(f'An Error happened processing request: {str(e)}')
-            return response_json({"error": str(e)}, status=500)
+        if isinstance(first_response, StopAsyncIteration):
+            await response.send("data: [DONE]\n\n")
+        await response.send(f"data: {first_response.model_dump_json(by_alias=True)}\n\n")
+        async for response in response_from_llm:
+            await response.send(f"data: {response.model_dump_json(by_alias=True)}\n\n")
+        await response.send("data: [DONE]\n\n")
+
     
     # Streaming response
     response = await request.respond(content_type="text/event-stream")
-    chunk_id = f"chatcmpl-{compute_message_hash(messages)}"
     
     response.headers["Cache-Control"] = "no-cache"
     response.headers["Connection"] = "keep-alive"
     
-    try:
+    # Normal response.
+    request_final_usage = None
+    output_texts = [""]
+    finish_reasons: List[Optional[str]] = [None]
 
-        logger.info(f"Entering Streamed response generation with usage {include_usage}")
+    # usage is always the last chunk
+    if response_from_llm.usage is not None:
+        request_final_usage = response_from_llm.usage
 
-        async for token in app.ctx.model.generate_stream(
-            messages,
-            max_tokens=data.get("max_tokens", 100),
-            temperature=data.get("temperature", 0.7)
-        ):
-            if isinstance(token, dict):
-                if token.get('choices', [{}])[0].get('finish_reason') is not None:
-                    continue
-                chunk = token
-            else:
-                chunk = {
-                    "id": chunk_id,
-                    "object": "chat.completion.chunk",
-                    "created": int(time.time()),
-                    "model": app.ctx.model.name,
-                    "choices": [{
-                        "index": 0,
-                        "delta": {
-                            "role": "assistant",
-                            "content": token
-                        },
-                        "finish_reason": None
-                    }]
-                }
-            
-            await response.send(f"data: {json.dumps(chunk)}\n\n")
-        
-        final_chunk = {
-            "id": chunk_id,
-            "object": "chat.completion.chunk",
-            "created": int(time.time()),
-            "model": app.ctx.model.name,
-            "choices": [{
-                "index": 0,
-                "delta": {},
-                "finish_reason": "stop"
-            }]
-        }
-        
-        await response.send(f"data: {json.dumps(final_chunk)}\n\n")
-        await response.send("data: [DONE]\n\n")
-    
-    except Exception as e:
-        logger.error(f'An Error happened processing request: {str(e)}')
-        await response.send(f"data: {json.dumps({'error': str(e)})}\n\n")
-    
-    finally:
-        await response.eof()
+    for choice in response_from_llm.choices:
+        assert isinstance(choice.delta.content, str)
+        output_texts[choice.index] += choice.delta.content
+        if choice.finish_reason is not None and finish_reasons[choice.index] is None:
+            finish_reasons[choice.index] = choice.finish_reason
+
+    assert all(finish_reason is not None for finish_reason in finish_reasons)
+
+    return wrap_chat_completion_response(
+        request_id=request_id,
+        model=request.model,
+        output_texts=output_texts,
+        finish_reasons=finish_reasons,
+        usage=request_final_usage,
+    )
