@@ -56,8 +56,11 @@ class MLCModel(ModelAdapter):
             model=self.model,
             stream=False,
         )
+
+        logger.debug(f"Response From LLM = {response.choices[0]}")
+
         
-        return response
+        return response.choices[0]
     
     def close(self):
         self.engine.terminate()

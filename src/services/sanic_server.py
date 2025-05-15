@@ -31,16 +31,19 @@ def create_server(model_info: ModelInfo) -> Sanic:
     WorkerManager.THRESHOLD = SANIC_WORKER_STARTUP_THRESHOLD
 
     # Set mock model in app context
-    @app.main_process_start
-    async def main_process_start(app):
+    @app.after_server_start
+    async def after_server_start(app):
         
         # Initialize the model with the specified path
+        logger.info(f"Worker Thread start thread with model_info {model_info}")
         model_port: ModelAdapter = create_model_instance(model_info)
         app.ctx.model = model_port
 
     
-    @app.main_process_stop
-    async def main_process_stop(app):
+    @app.after_server_stop
+    async def after_server_stop(app):
+        logger.info(f"Worker Stop thread with app.ctx {app.ctx.model.name}")
+
         if hasattr(app.ctx.model, 'close'):
             app.ctx.model.close()
 

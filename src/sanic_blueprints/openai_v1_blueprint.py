@@ -30,6 +30,8 @@ async def chat_completions(request):
 
         try:
 
+            logger.info(f"Entering not-streamed response generation with usage {include_usage}")
+
             usage: dict = {}
             choices: dict = {}
 
@@ -75,7 +77,7 @@ async def chat_completions(request):
                 "id": "chatcmpl-" + compute_message_hash(messages),
                 "object": "chat.completion",
                 "created": int(time.time()),
-                "model": "nanollm",
+                "model": app.ctx.model.name,
                 "choices": choices,
                 "usage": usage
             }
@@ -85,7 +87,7 @@ async def chat_completions(request):
         
         except Exception as e:
 
-            logger.error(f'An Error happened processing {response_from_llm}: {str(e)}')
+            logger.error(f'An Error happened processing request: {str(e)}')
             return response_json({"error": str(e)}, status=500)
     
     # Streaming response
@@ -96,6 +98,9 @@ async def chat_completions(request):
     response.headers["Connection"] = "keep-alive"
     
     try:
+
+        logger.info(f"Entering Streamed response generation with usage {include_usage}")
+
         async for token in app.ctx.model.generate_stream(
             messages,
             max_tokens=data.get("max_tokens", 100),
@@ -110,7 +115,7 @@ async def chat_completions(request):
                     "id": chunk_id,
                     "object": "chat.completion.chunk",
                     "created": int(time.time()),
-                    "model": "nanollm",
+                    "model": app.ctx.model.name,
                     "choices": [{
                         "index": 0,
                         "delta": {
@@ -127,7 +132,7 @@ async def chat_completions(request):
             "id": chunk_id,
             "object": "chat.completion.chunk",
             "created": int(time.time()),
-            "model": "nanollm",
+            "model": app.ctx.model.name,
             "choices": [{
                 "index": 0,
                 "delta": {},
@@ -139,6 +144,7 @@ async def chat_completions(request):
         await response.send("data: [DONE]\n\n")
     
     except Exception as e:
+        logger.error(f'An Error happened processing request: {str(e)}')
         await response.send(f"data: {json.dumps({'error': str(e)})}\n\n")
     
     finally:
