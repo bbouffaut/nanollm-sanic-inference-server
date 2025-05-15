@@ -14,3 +14,6 @@ class ModelAdapter(ABC):
 
     def count_nb_tokens(self, text, model_local_path_for_tokenizer):
         pass
+
+    def close(self):
+        pass

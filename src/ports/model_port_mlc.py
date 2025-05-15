@@ -31,14 +31,15 @@ class MLCModel(ModelAdapter):
     name: str = "MLCModel"
     has_arguments: bool = True
 
-    def __init__(self, model_path: str, gpu: bool):
+    def __init__(self, model_path: str, gpu: bool, model_lib: str):
         device_map = 'cuda' if gpu else 'cpu'
         self.model = model_path
-        self.engine = MLCEngine(model_path, mode='local', device=device_map)
+        self.engine = MLCEngine(model_path, mode='local', device=device_map, model_lib=model_lib)
         logger.info(f'MLC Model instance created with params with {model_path}')
           
 
     async def generate_stream(self, messages):
+        logger.debug(f"MLC GenerateSTREAM with model {self.model} and messages {messages}")
         for response in self.engine.chat.completions.create(
             messages=messages,
             model=self.model,
@@ -57,5 +58,8 @@ class MLCModel(ModelAdapter):
         )
         
         return response
+    
+    def close(self):
+        self.engine.terminate()
 
         

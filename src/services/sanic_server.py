@@ -38,4 +38,10 @@ def create_server(model_info: ModelInfo) -> Sanic:
         model_port: ModelAdapter = create_model_instance(model_info)
         app.ctx.model = model_port
 
+    
+    @app.main_process_stop
+    async def main_process_stop(app):
+        if hasattr(app.ctx.model, 'close'):
+            app.ctx.model.close()
+
     return app

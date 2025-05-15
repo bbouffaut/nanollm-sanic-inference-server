@@ -20,7 +20,8 @@
         "name": "MLCModel",
         "params": {
             "model_path": "HF://mlc-ai/gemma-2-2b-it-q4f16_1-MLC",
-            "gpu": "True"
+            "gpu": "True",
+            "model_lib": "/data/models/mlc_llm/mlc-ai/gemma-2-2b-it-q4f16_1-MLC/aarch64-cu126-sm87.so"
         }
     },
     "echo-server-with-tokenizer": {
