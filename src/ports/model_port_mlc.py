@@ -7,6 +7,7 @@ from src.utils.logger import logger
 from mlc_llm import MLCEngine
 
 
+
 class MLCModel(ModelAdapter):
 
     name: str = "MLCModel"
@@ -27,7 +28,7 @@ class MLCModel(ModelAdapter):
             stream=True,
         ):
             for chunk in response:
-                yield ChatCompletionStreamResponse(**chunk) 
+                yield chunk 
         
     
     async def generate(self, messages, max_tokens=100, temperature=0.7) -> ChatCompletionResponse:
@@ -40,7 +41,7 @@ class MLCModel(ModelAdapter):
 
         logger.debug(f"Response From LLM = {response}")
 
-        return ChatCompletionResponse(**response)
+        return response
     
     def close(self):
         self.engine.terminate()

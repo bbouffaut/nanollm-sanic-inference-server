@@ -35,4 +35,7 @@ test-cuda-llama-cpp:
 test-mlc:
 	TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ python3 tests/test-mlc.py
 
-
+# /!\ MUST BE RUN BEFORE MLC server to propermyu load and compile the binary
+# ALSO: rename the *.si file with the name configured in model_param.json file
+load-mlc-model-gemma2:
+	mlc_llm chat HF://mlc-ai/gemma-2-2b-it-q4f16_1-MLC

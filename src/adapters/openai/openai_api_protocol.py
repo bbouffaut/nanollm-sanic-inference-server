@@ -16,6 +16,8 @@ from .conversation_protocol import Conversation
 from .debug_protocol import DebugConfig
 from .error_protocol import BadRequestError
 
+from mlc_llm.protocol.openai_api_protocol import CompletionUsage as CompletionUsageFromMLC
+
 ################ Commons ################
 
 
@@ -388,7 +390,7 @@ class ChatCompletionResponse(BaseModel):
     model: Optional[str] = None
     system_fingerprint: Optional[str] = None
     object: Literal["chat.completion"] = "chat.completion"
-    usage: Optional[CompletionUsage] = None
+    usage: Optional[CompletionUsage | CompletionUsageFromMLC ] = None
 
 
 class ChatCompletionStreamResponse(BaseModel):

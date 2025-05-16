@@ -6,7 +6,7 @@ from sanic.response import json as response_json
 from src.services.openai_services import wrap_chat_completion_response
 from src.utils.logger import logger
 from src.utils.utils import random_uuid
-from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse, CompletionUsage
 
 
 
@@ -73,7 +73,7 @@ async def chat_completions(request):
 
     # usage is always the last chunk
     if hasattr(response_from_llm, 'usage') and response_from_llm.usage is not None:
-        request_final_usage = response_from_llm.usage
+        request_final_usage: CompletionUsage = response_from_llm.usage
 
     for choice in response_from_llm.choices:
         assert isinstance(choice.message.content, str)

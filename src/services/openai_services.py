@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional
-from src.adapters.openai.openai_api_protocol import ChatCompletionMessage, ChatCompletionResponse, ChatCompletionResponseChoice, ChatToolCall, CompletionLogProbs, CompletionResponse, CompletionResponseChoice, CompletionUsage, LogProbs, LogProbsContent
+from src.adapters.openai.openai_api_protocol import ChatCompletionMessage, ChatCompletionResponse, ChatCompletionResponseChoice, ChatToolCall, CompletionUsage, LogProbs, LogProbsContent
 from src.utils.logger import logger
 from src.adapters.model_adapter import ModelAdapter
 from transformers import AutoTokenizer
@@ -103,5 +103,5 @@ def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
         ],
         model=model,
         system_fingerprint="",
-        usage=usage,
+        usage=usage
     )

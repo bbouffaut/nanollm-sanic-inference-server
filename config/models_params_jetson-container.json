@@ -21,7 +21,7 @@
         "params": {
             "model_path": "HF://mlc-ai/gemma-2-2b-it-q4f16_1-MLC",
             "gpu": "True",
-            "model_lib": "/data/models/mlc_llm/mlc-ai/gemma-2-2b-it-q4f16_1-MLC/aarch64-cu126-sm87.so"
+            "model_lib": "/data/models/mlc_llm/model_lib/mlc-ai_gemma-2-2b-it-q4f16-1-mlc_aarch64-cu126-sm87.so"
         }
     },
     "mlc-server-llama3": {
