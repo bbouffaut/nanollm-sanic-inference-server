@@ -386,7 +386,7 @@ class ChatCompletionResponse(BaseModel):
     choices: List[ChatCompletionResponseChoice]
     created: int = Field(default_factory=lambda: int(time.time()))
     model: Optional[str] = None
-    system_fingerprint: str
+    system_fingerprint: Optional[str] = None
     object: Literal["chat.completion"] = "chat.completion"
     usage: Optional[CompletionUsage] = None
 
@@ -400,7 +400,7 @@ class ChatCompletionStreamResponse(BaseModel):
     choices: List[ChatCompletionStreamResponseChoice]
     created: int = Field(default_factory=lambda: int(time.time()))
     model: Optional[str] = None
-    system_fingerprint: str
+    system_fingerprint: Optional[str] = None
     object: Literal["chat.completion.chunk"] = "chat.completion.chunk"
     usage: Optional[CompletionUsage] = None
 

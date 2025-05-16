@@ -1,35 +1,12 @@
 
+from typing import Any, AsyncGenerator
 from src.adapters.model_adapter import ModelAdapter
-from src.adapters.openai.openai_api_protocol import ChatCompletionResponse
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, CompletionResponse
 from src.utils.logger import logger
 
 from mlc_llm import MLCEngine
 
 
-def transformers_generate(messages, llm, temperature):
-    response = llm.create_chat_completion(
-        messages=messages,
-        temperature=temperature,
-        stream=False
-    )
-    print(f'Response: {response}')
-    return response
-    
-
-async def transformers_generate_stream(messages, llm, temperature):
-    response = llm.create_chat_completion(
-        messages=messages,
-        temperature=temperature,
-        stream=True
-    )
-    for chunk in response:
-        yield chunk
-
-# Add this method to the MLCModel class
-
-
-    
-# Replace the model with mock functions
 class MLCModel(ModelAdapter):
 
     name: str = "MLCModel"
@@ -42,7 +19,7 @@ class MLCModel(ModelAdapter):
         logger.info(f'MLC Model instance created with params with {model_path}')
           
 
-    async def generate_stream(self, messages):
+    async def generate_stream(self, messages) -> AsyncGenerator[CompletionResponse, Any]:
         logger.debug(f"MLC GenerateSTREAM with model {self.model} and messages {messages}")
         for response in self.engine.chat.completions.create(
             messages=messages,
@@ -50,10 +27,10 @@ class MLCModel(ModelAdapter):
             stream=True,
         ):
             for chunk in response:
-                yield chunk 
+                yield ChatCompletionResponse(**chunk) 
         
     
-    async def generate(self, messages, max_tokens=100, temperature=0.7):
+    async def generate(self, messages, max_tokens=100, temperature=0.7) -> ChatCompletionResponse:
         logger.debug(f"MLC Generate with model {self.model} and messages {messages}")
         response: ChatCompletionResponse = self.engine.chat.completions.create(
             messages=messages,
@@ -63,7 +40,7 @@ class MLCModel(ModelAdapter):
 
         logger.debug(f"Response From LLM = {response}")
 
-        return response
+        return ChatCompletionResponse(**response)
     
     def close(self):
         self.engine.terminate()

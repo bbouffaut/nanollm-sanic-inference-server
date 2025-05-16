@@ -76,10 +76,10 @@ def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
     model: str,
     output_texts: List[str],
     finish_reasons: List[str],
-    tool_calls_list: List[List[ChatToolCall]],
-    logprob_results: Optional[List[List[LogProbsContent]]],
-    use_function_calling: bool,
-    usage: Optional[Dict[str, Any]],
+    tool_calls_list: Optional[List[List[ChatToolCall]]] = None,
+    logprob_results: Optional[List[List[LogProbsContent]]] = None,
+    use_function_calling: Optional[bool] = None,
+    usage: Optional[Dict[str, Any]] = None,
 ) -> ChatCompletionResponse:
     """Wrap the non-streaming chat completion results to ChatCompletionResponse instance."""
     return ChatCompletionResponse(
@@ -90,10 +90,6 @@ def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
                 finish_reason=finish_reasons[i],
                 message=(
                     ChatCompletionMessage(role="assistant", content=output_text)
-                    if not use_function_calling or finish_reason == "error"
-                    else ChatCompletionMessage(
-                        role="assistant", tool_calls=tool_calls
-                    )
                 ),
                 logprobs=(
                     LogProbs(content=logprob_results[i])
@@ -101,8 +97,8 @@ def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
                     else None
                 ),
             )
-            for i, (output_text, finish_reason, tool_calls) in enumerate(
-                zip(output_texts, finish_reasons, tool_calls_list)
+            for i, (output_text, finish_reason) in enumerate(
+                zip(output_texts, finish_reasons)
             )
         ],
         model=model,

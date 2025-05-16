@@ -1,9 +1,13 @@
-from typing import List, Optional
+import json
+from typing import Any, AsyncGenerator, List, Optional
 from sanic import Blueprint
+from sanic.response import json as response_json
 
-from src.adapters.openai.openai_api_protocol import LogProbsContent
 from src.services.openai_services import wrap_chat_completion_response
+from src.utils.logger import logger
 from src.utils.utils import random_uuid
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse
+
 
 
 openai_v1_bp = Blueprint('openai', url_prefix = '/v1')
@@ -23,18 +27,21 @@ async def chat_completions(request):
     stream = data.get("stream", False)
     include_usage = data.get("include_usage", False)
     request_id = f"chatcmpl-{random_uuid()}"
-
-    response_from_llm = await app.ctx.model.generate(
-        messages,
-        max_tokens=data.get("max_tokens", 100),
-        temperature=data.get("temperature", 0.7)
-    )
    
     if stream:
 
-        first_response = await anext(  # type: ignore  # pylint: disable=undefined-variable
+        response_from_llm: AsyncGenerator[CompletionResponse, Any] = app.ctx.model.generate_stream(
+            messages,
+            max_tokens=data.get("max_tokens", 100),
+            temperature=data.get("temperature", 0.7)
+        )
+
+        first_response: ChatCompletionResponse = await anext(  # type: ignore  # pylint: disable=undefined-variable
             response_from_llm
         )
+
+        logger.debug(f"first_response = {first_response}")
+        
         # Streaming response
         response = await request.respond(content_type="text/event-stream")
         
@@ -44,38 +51,44 @@ async def chat_completions(request):
         if isinstance(first_response, StopAsyncIteration):
             await response.send("data: [DONE]\n\n")
         await response.send(f"data: {first_response.model_dump_json(by_alias=True)}\n\n")
-        async for response in response_from_llm:
-            await response.send(f"data: {response.model_dump_json(by_alias=True)}\n\n")
+        
+        async for response_chunk in response_from_llm:
+            await response.send(f"data: {response_chunk.model_dump_json(by_alias=True)}\n\n")
+        
         await response.send("data: [DONE]\n\n")
+        return
 
     
-    # Streaming response
-    response = await request.respond(content_type="text/event-stream")
-    
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["Connection"] = "keep-alive"
-    
+    # Non Streaming response
+    response_from_llm: ChatCompletionStreamResponse = await app.ctx.model.generate(
+        messages,
+        max_tokens=data.get("max_tokens", 100),
+        temperature=data.get("temperature", 0.7)
+    )
+
     # Normal response.
     request_final_usage = None
     output_texts = [""]
     finish_reasons: List[Optional[str]] = [None]
 
     # usage is always the last chunk
-    if response_from_llm.usage is not None:
+    if hasattr(response_from_llm, 'usage') and response_from_llm.usage is not None:
         request_final_usage = response_from_llm.usage
 
     for choice in response_from_llm.choices:
-        assert isinstance(choice.delta.content, str)
-        output_texts[choice.index] += choice.delta.content
+        assert isinstance(choice.message.content, str)
+        output_texts[choice.index] += choice.message.content
         if choice.finish_reason is not None and finish_reasons[choice.index] is None:
             finish_reasons[choice.index] = choice.finish_reason
 
     assert all(finish_reason is not None for finish_reason in finish_reasons)
 
-    return wrap_chat_completion_response(
+    completion_response: ChatCompletionResponse = wrap_chat_completion_response(
         request_id=request_id,
-        model=request.model,
+        model=app.ctx.model.name,
         output_texts=output_texts,
         finish_reasons=finish_reasons,
         usage=request_final_usage,
     )
+
+    return response_json(json.loads(completion_response.model_dump_json(by_alias=True)))
