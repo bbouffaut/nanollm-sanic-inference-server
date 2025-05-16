@@ -1,5 +1,5 @@
 
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Optional
 from src.adapters.model_adapter import ModelAdapter
 from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse
 from src.utils.logger import logger
@@ -20,7 +20,7 @@ class MLCModel(ModelAdapter):
         logger.info(f'MLC Model instance created with params with {model_path}')
           
 
-    async def generate_stream(self, messages) -> AsyncGenerator[CompletionResponse, Any]:
+    async def generate_stream(self, messages, max_tokens: Optional[int], temperature: Optional[float]) -> AsyncGenerator[CompletionResponse, Any]:
         logger.debug(f"MLC GenerateSTREAM with model {self.model} and messages {messages}")
         for response in self.engine.chat.completions.create(
             messages=messages,
