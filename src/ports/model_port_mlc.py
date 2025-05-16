@@ -22,13 +22,13 @@ class MLCModel(ModelAdapter):
 
     async def generate_stream(self, messages, max_tokens: Optional[int], temperature: Optional[float]) -> AsyncGenerator[CompletionResponse, Any]:
         logger.debug(f"MLC GenerateSTREAM with model {self.model} and messages {messages}")
-        for response in self.engine.chat.completions.create(
+        for chunk in self.engine.chat.completions.create(
             messages=messages,
             model=self.model,
             stream=True,
         ):
-            for chunk in response:
-                yield chunk 
+            logger.debug(f"MLC chunk = {chunk}")
+            yield chunk 
         
     
     async def generate(self, messages, max_tokens=100, temperature=0.7) -> ChatCompletionResponse:
