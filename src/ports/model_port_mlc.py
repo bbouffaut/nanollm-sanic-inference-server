@@ -1,7 +1,7 @@
 
 from typing import Any, AsyncGenerator
 from src.adapters.model_adapter import ModelAdapter
-from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, CompletionResponse
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse
 from src.utils.logger import logger
 
 from mlc_llm import MLCEngine
@@ -27,7 +27,7 @@ class MLCModel(ModelAdapter):
             stream=True,
         ):
             for chunk in response:
-                yield ChatCompletionResponse(**chunk) 
+                yield ChatCompletionStreamResponse(**chunk) 
         
     
     async def generate(self, messages, max_tokens=100, temperature=0.7) -> ChatCompletionResponse:
