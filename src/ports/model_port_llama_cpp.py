@@ -15,7 +15,7 @@ def add_role_to_choices(chunk, role):
     
     return chunk
 
-def llama_cpp_generate(messages, llm, max_tokens, temperature) -> CompletionResponse:
+def llama_cpp_generate_chat(messages, llm, max_tokens, temperature) -> CompletionResponse:
     response: ChatCompletionResponse = llm.create_chat_completion(
         messages=messages,
         temperature=temperature,
@@ -26,7 +26,7 @@ def llama_cpp_generate(messages, llm, max_tokens, temperature) -> CompletionResp
     return ChatCompletionResponse(**{**response, 'finish_reason': 'stop'})
     
 
-async def llama_cpp_generate_stream(messages, llm, max_tokens, temperature) -> AsyncGenerator[CompletionResponse, Any]:
+async def llama_cpp_generate_chat_stream(messages, llm, max_tokens, temperature) -> AsyncGenerator[CompletionResponse, Any]:
     response: ChatCompletionStreamResponse = llm.create_chat_completion(
         messages=messages,
         temperature=temperature,
@@ -38,6 +38,29 @@ async def llama_cpp_generate_stream(messages, llm, max_tokens, temperature) -> A
         chunk = add_role_to_choices(chunk, 'assistant')
         logger.debug(f"llama.cpp chunk = {chunk}")
         yield ChatCompletionStreamResponse(**{**chunk, 'finish_reason': None})
+
+def llama_cpp_generate(prompt, llm, max_tokens, temperature) -> CompletionResponse:
+    response: CompletionResponse = llm.create_completion(
+        prompt=prompt,
+        temperature=temperature,
+        stream=False,
+        max_tokens=max_tokens
+    )
+    logger.debug(f'llama.cpp response: {response}')
+    return response
+    
+
+async def llama_cpp_generate_stream(prompt, llm, max_tokens, temperature) -> AsyncGenerator[CompletionResponse, Any]:
+    response: ChatCompletionStreamResponse = llm.create_completion(
+        prompt=prompt,
+        temperature=temperature,
+        stream=True,
+        max_tokens=max_tokens
+    )
+    logger.debug(f"llama.ccp Response: {response}")
+    for chunk in response:
+        logger.debug(f"llama.cpp chunk = {chunk}")
+        yield chunk # CompletionResponse
     
 
 def generate_prompt(messages):
@@ -60,9 +83,16 @@ class LlamaCppModel(ModelAdapter):
         logger.info(f"Initialized LlamaCppModel with model path: {model_path} and gpu: {gpu}")
         # traceback.print_stack()  # Show where it's being called from
 
-    async def generate(self, messages, max_tokens=100, temperature=0.7) -> CompletionResponse:
-        return llama_cpp_generate(messages, self.llm, max_tokens, temperature)
+    async def generate_chat(self, messages, max_tokens=100, temperature=0.7) -> CompletionResponse:
+        return llama_cpp_generate_chat(messages, self.llm, max_tokens, temperature)
     
-    async def generate_stream(self, messages, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
-        async for chunk in llama_cpp_generate_stream(messages, self.llm, max_tokens, temperature):
+    async def generate_chat_stream(self, messages, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
+        async for chunk in llama_cpp_generate_chat_stream(messages, self.llm, max_tokens, temperature):
+            yield chunk
+
+    async def generate(self, prompt, max_tokens=100, temperature=0.7) -> CompletionResponse:
+        return llama_cpp_generate_chat(prompt, self.llm, max_tokens, temperature)
+    
+    async def generate_stream(self, prompt, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
+        async for chunk in llama_cpp_generate_chat_stream(prompt, self.llm, max_tokens, temperature):
             yield chunk

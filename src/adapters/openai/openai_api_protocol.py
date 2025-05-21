@@ -173,7 +173,7 @@ class CompletionResponse(BaseModel):
     created: int = Field(default_factory=lambda: int(time.time()))
     model: Optional[str] = None
     object: str = "text_completion"
-    usage: Optional[CompletionUsage] = None
+    usage: Optional[CompletionUsage | CompletionUsageFromMLC ] = None
 
 
 ################ v1/chat/completions ################

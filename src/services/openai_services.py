@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional
-from src.adapters.openai.openai_api_protocol import ChatCompletionMessage, ChatCompletionResponse, ChatCompletionResponseChoice, ChatToolCall, CompletionUsage, LogProbs, LogProbsContent
+from src.adapters.openai.openai_api_protocol import ChatCompletionMessage, ChatCompletionResponse, ChatCompletionResponseChoice, ChatToolCall, CompletionLogProbs, CompletionResponse, CompletionResponseChoice, CompletionUsage, LogProbs, LogProbsContent
 from src.utils.logger import logger
 from src.adapters.model_adapter import ModelAdapter
 from transformers import AutoTokenizer
@@ -79,9 +79,10 @@ def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
     tool_calls_list: Optional[List[List[ChatToolCall]]] = None,
     logprob_results: Optional[List[List[LogProbsContent]]] = None,
     use_function_calling: Optional[bool] = None,
-    usage: Optional[Dict[str, Any]] = None,
+    usage: Optional[CompletionUsage] = None,
 ) -> ChatCompletionResponse:
     """Wrap the non-streaming chat completion results to ChatCompletionResponse instance."""
+    logger.debug(f"Type of usage is {type(usage)}")
     return ChatCompletionResponse(
         id=request_id,
         choices=[
@@ -104,4 +105,32 @@ def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
         model=model,
         system_fingerprint="",
         usage=usage
+    )
+
+def wrap_completion_response(  # pylint: disable=too-many-arguments
+    request_id: str,
+    model: str,
+    output_texts: List[str],
+    finish_reasons: List[str],
+    logprob_results: Optional[List[Optional[CompletionLogProbs]]] = None,
+    usage: Optional[CompletionUsage] = None,
+) -> CompletionResponse:
+    """Wrap the non-streaming completion results to CompletionResponse instance."""
+    return CompletionResponse(
+        id=request_id,
+        choices=[
+            CompletionResponseChoice(
+                index=i,
+                finish_reason=finish_reason,
+                text=output_text,
+                logprobs=(
+                    LogProbs(content=logprob_results[i])
+                    if logprob_results is not None
+                    else None
+                )
+            )
+            for i, (output_text, finish_reason) in enumerate(zip(output_texts, finish_reasons))
+        ],
+        model=model,
+        usage=usage,
     )

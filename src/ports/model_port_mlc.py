@@ -20,21 +20,44 @@ class MLCModel(ModelAdapter):
         logger.info(f'MLC Model instance created with params with {model_path}')
           
 
-    async def generate_stream(self, messages, max_tokens: Optional[int], temperature: Optional[float]) -> AsyncGenerator[CompletionResponse, Any]:
-        logger.debug(f"MLC GenerateSTREAM with model {self.model} and messages {messages}")
+    async def generate_chat_stream(self, messages, max_tokens: Optional[int], temperature: Optional[float]) -> AsyncGenerator[CompletionResponse, Any]:
+        logger.debug(f"MLC ChatGenerateSTREAM with model {self.model} and messages {messages}")
         for chunk in self.engine.chat.completions.create(
             messages=messages,
             model=self.model,
             stream=True,
         ):
             logger.debug(f"MLC chunk = {chunk}")
-            yield chunk 
+            yield chunk #ChatCompletionStreamResponse type
         
     
-    async def generate(self, messages, max_tokens=100, temperature=0.7) -> ChatCompletionResponse:
-        logger.debug(f"MLC Generate with model {self.model} and messages {messages}")
+    async def generate_chat(self, messages, max_tokens=100, temperature=0.7) -> ChatCompletionResponse:
+        logger.debug(f"MLC ChatGenerate with model {self.model} and messages {messages}")
         response: ChatCompletionResponse = self.engine.chat.completions.create(
             messages=messages,
+            model=self.model,
+            stream=False,
+        )
+
+        logger.debug(f"Response From LLM = {response}")
+
+        return response
+    
+    async def generate_stream(self, prompt, max_tokens: Optional[int], temperature: Optional[float]) -> AsyncGenerator[CompletionResponse, Any]:
+        logger.debug(f"MLC GenerateSTREAM with model {self.model} and prompt {prompt}")
+        for chunk in self.engine.completions.create(
+            prompt=prompt,
+            model=self.model,
+            stream=True,
+        ):
+            logger.debug(f"MLC chunk = {chunk}")
+            yield chunk #CompletionStreamResponse type
+        
+    
+    async def generate(self, prompt, max_tokens=100, temperature=0.7) -> CompletionResponse:
+        logger.debug(f"MLC Generate with model {self.model} and prompt {prompt}")
+        response: CompletionResponse = self.engine.completions.create(
+            prompt=prompt,
             model=self.model,
             stream=False,
         )

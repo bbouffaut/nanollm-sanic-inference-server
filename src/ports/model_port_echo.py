@@ -17,9 +17,16 @@ class EchoModel(ModelAdapter):
 
     name: str = "EchoModel"
 
-    async def generate(self, messages, max_tokens=100, temperature=0.7):
+    async def generate_chat(self, messages, max_tokens=100, temperature=0.7):
         return await mirror_generate(generate_prompt_text_from_messages(messages))
     
-    async def generate_stream(self, messages, max_tokens=100, temperature=0.7):
+    async def generate_chat_stream(self, messages, max_tokens=100, temperature=0.7):
         async for token in mirror_generate_stream(generate_prompt_text_from_messages(messages)):
+            yield token
+
+    async def generate(self, prompt, max_tokens=100, temperature=0.7):
+        return await mirror_generate(prompt)
+    
+    async def generate_stream(self, prompt, max_tokens=100, temperature=0.7):
+        async for token in mirror_generate_stream(prompt):
             yield token

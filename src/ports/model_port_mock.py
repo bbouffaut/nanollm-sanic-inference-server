@@ -24,9 +24,16 @@ class MockModel(ModelAdapter):
 
     name: str = "MockModel"
 
-    async def generate(self, messages, max_tokens=100, temperature=0.7):
+    async def generate(self, prompt, max_tokens=100, temperature=0.7):
         return await mock_generate()
     
-    async def generate_stream(self, messages, max_tokens=100, temperature=0.7):
+    async def generate_stream(self, prompt, max_tokens=100, temperature=0.7):
+        async for token in mock_generate_stream():
+            yield token
+
+    async def generate_chat(self, messages, max_tokens=100, temperature=0.7):
+        return await self.generate(messages, max_tokens, temperature)
+    
+    async def generate_chat_stream(self, messages, max_tokens=100, temperature=0.7):
         async for token in mock_generate_stream():
             yield token
