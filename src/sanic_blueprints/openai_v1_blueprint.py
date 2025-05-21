@@ -56,6 +56,7 @@ async def chat_completions(request):
             await response.send(f"data: {response_chunk.model_dump_json(by_alias=True)}\n\n")
         
         # Add timing information in the final [DONE] message
+        app.ctx.model.get_stats()
         processing_time = time.time() - start_time
         final_usage = {
             "prompt_tokens": 0,  # These will be filled by the model if available

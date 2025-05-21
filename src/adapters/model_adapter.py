@@ -23,3 +23,6 @@ class ModelAdapter(ABC):
 
     def close(self):
         pass
+
+    def get_stats(self):
+        pass

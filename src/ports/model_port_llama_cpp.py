@@ -96,3 +96,6 @@ class LlamaCppModel(ModelAdapter):
     async def generate_stream(self, prompt, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
         async for chunk in llama_cpp_generate_stream(prompt, self.llm, max_tokens, temperature):
             yield chunk
+
+    def get_stats(self):
+        logger.info(f"Context = {self.llm.ctx}")
