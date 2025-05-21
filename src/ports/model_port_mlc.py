@@ -26,6 +26,9 @@ class MLCModel(ModelAdapter):
             messages=messages,
             model=self.model,
             stream=True,
+            stream_options = {
+                "include_usage": True
+            }
         ):
             logger.debug(f"MLC chunk = {chunk}")
             yield chunk #ChatCompletionStreamResponse type
@@ -49,6 +52,9 @@ class MLCModel(ModelAdapter):
             prompt=prompt,
             model=self.model,
             stream=True,
+            stream_options = {
+                "include_usage": True
+            }
         ):
             logger.debug(f"MLC chunk = {chunk}")
             yield chunk #CompletionStreamResponse type
@@ -59,7 +65,7 @@ class MLCModel(ModelAdapter):
         response: CompletionResponse = await self.engine.completions.create(
             prompt=prompt,
             model=self.model,
-            stream=False,
+            stream=False
         )
 
         logger.debug(f"Response From LLM = {response}")

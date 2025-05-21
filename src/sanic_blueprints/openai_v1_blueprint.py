@@ -27,8 +27,7 @@ async def chat_completions(request):
     messages = data.get("messages", [])
     stream = data.get("stream", False)
     request_id = f"chatcmpl-{random_uuid()}"
-    start_time = time.time()
-   
+
     if stream:
         response_from_llm: AsyncGenerator[ChatCompletionResponse, Any] = app.ctx.model.generate_chat_stream(
             messages,
@@ -57,20 +56,7 @@ async def chat_completions(request):
         
         # Add timing information in the final [DONE] message
         app.ctx.model.get_stats()
-        processing_time = time.time() - start_time
-        final_usage = {
-            "prompt_tokens": 0,  # These will be filled by the model if available
-            "completion_tokens": 0,
-            "total_tokens": 0,
-            "extra": {
-                "processing_time_seconds": round(processing_time, 3)
-            }
-        }
-        final_response = {
-            "data": "[DONE]",
-            "usage": final_usage
-        }
-        await response.send(f"data: {json.dumps(final_response)}\n\n")
+        await response.send("data: [DONE]\n\n")
         return
 
     
@@ -89,9 +75,6 @@ async def chat_completions(request):
     # usage is always the last chunk
     if hasattr(response_from_llm, 'usage') and response_from_llm.usage is not None:
         request_final_usage: CompletionUsage = response_from_llm.usage
-        if request_final_usage.extra is None:
-            request_final_usage.extra = {}
-        request_final_usage.extra["processing_time_seconds"] = round(time.time() - start_time, 3)
 
     for choice in response_from_llm.choices:
         assert isinstance(choice.message.content, str)
@@ -118,7 +101,6 @@ async def completions(request):
     prompt = data.get("prompt", "")
     stream = data.get("stream", False)
     request_id = f"cmpl-{random_uuid()}"
-    start_time = time.time()
    
     if stream:
 
@@ -147,21 +129,7 @@ async def completions(request):
         async for response_chunk in response_from_llm:
             await response.send(f"data: {response_chunk.model_dump_json(by_alias=True)}\n\n")
         
-        # Add timing information in the final [DONE] message
-        processing_time = time.time() - start_time
-        final_usage = {
-            "prompt_tokens": 0,  # These will be filled by the model if available
-            "completion_tokens": 0,
-            "total_tokens": 0,
-            "extra": {
-                "processing_time_seconds": round(processing_time, 3)
-            }
-        }
-        final_response = {
-            "data": "[DONE]",
-            "usage": final_usage
-        }
-        await response.send(f"data: {json.dumps(final_response)}\n\n")
+        await response.send("data: [DONE]\n\n")
         return
 
     
@@ -180,9 +148,6 @@ async def completions(request):
     # usage is always the last chunk
     if hasattr(response_from_llm, 'usage') and response_from_llm.usage is not None:
         request_final_usage: CompletionUsage = response_from_llm.usage
-        if request_final_usage.extra is None:
-            request_final_usage.extra = {}
-        request_final_usage.extra["processing_time_seconds"] = round(time.time() - start_time, 3)
 
     for choice in response_from_llm.choices:
         assert isinstance(choice.text, str)

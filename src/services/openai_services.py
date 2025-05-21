@@ -82,7 +82,6 @@ def wrap_chat_completion_response(  # pylint: disable=too-many-arguments
     usage: Optional[CompletionUsage] = None,
 ) -> ChatCompletionResponse:
     """Wrap the non-streaming chat completion results to ChatCompletionResponse instance."""
-    logger.debug(f"Type of usage is {type(usage)}")
     return ChatCompletionResponse(
         id=request_id,
         choices=[
