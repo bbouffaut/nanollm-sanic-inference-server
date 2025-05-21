@@ -98,4 +98,4 @@ class LlamaCppModel(ModelAdapter):
             yield chunk
 
     def get_stats(self):
-        logger.info(f"Context = {self.llm.ctx}")
+        logger.info(f"Context = {self.llm.ctx()}")

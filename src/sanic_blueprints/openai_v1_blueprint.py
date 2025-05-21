@@ -57,6 +57,8 @@ async def chat_completions(request):
         # Add timing information in the final [DONE] message
         app.ctx.model.get_stats()
         await response.send("data: [DONE]\n\n")
+        
+        app.ctx.model.get_stats()
         return
 
     
@@ -91,6 +93,8 @@ async def chat_completions(request):
         finish_reasons=finish_reasons,
         usage=request_final_usage,
     )
+    
+    app.ctx.model.get_stats()
 
     return response_json(json.loads(completion_response.model_dump_json(by_alias=True)))
 
@@ -130,6 +134,9 @@ async def completions(request):
             await response.send(f"data: {response_chunk.model_dump_json(by_alias=True)}\n\n")
         
         await response.send("data: [DONE]\n\n")
+
+        app.ctx.model.get_stats()
+
         return
 
     
@@ -164,5 +171,7 @@ async def completions(request):
         finish_reasons=finish_reasons,
         usage=request_final_usage
     )
+
+    app.ctx.model.get_stats()
 
     return response_json(json.loads(completion_response.model_dump_json(by_alias=True)))
