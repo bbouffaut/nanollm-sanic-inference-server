@@ -135,7 +135,7 @@ async def completions(request):
         
         await response.send("data: [DONE]\n\n")
 
-        app.ctx.model.get_stats()
+        logger.debug(f"Stats = {app.ctx.model.get_stats()}")
 
         return
 
@@ -171,7 +171,4 @@ async def completions(request):
         finish_reasons=finish_reasons,
         usage=request_final_usage
     )
-
-    app.ctx.model.get_stats()
-
     return response_json(json.loads(completion_response.model_dump_json(by_alias=True)))
