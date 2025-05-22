@@ -1,8 +1,10 @@
+import sys
 from typing import Any, AsyncGenerator
 from llama_cpp import Llama
 from src.adapters.model_adapter import ModelAdapter
-from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse, CompletionUsage
 from src.utils.logger import logger
+import llama_cpp
 
 def add_role_to_choices(chunk, role):
 
@@ -88,93 +90,116 @@ class LlamaCppModel(ModelAdapter):
         # traceback.print_stack()  # Show where it's being called from
 
     async def generate_chat(self, messages, max_tokens=100, temperature=0.7) -> CompletionResponse:
-        return llama_cpp_generate_chat(messages, self.llm, max_tokens, temperature)
+        response = llama_cpp_generate_chat(messages, self.llm, max_tokens, temperature)
+        # Get stats and create usage
+        stats = self.get_stats()
+
+        response.usage.extra = stats
+        return response
     
     async def generate_chat_stream(self, messages, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
         async for chunk in llama_cpp_generate_chat_stream(messages, self.llm, max_tokens, temperature):
+            # Check if this is the last chunk
+            if any(choice.finish_reason == 'stop' for choice in chunk.choices):
+                # Get stats and create usage
+                stats = self.get_stats()
+                # Extract token-related fields and keep the rest in extra
+                token_stats = {
+                    'prompt_tokens': stats.pop('prompt_tokens', 0),
+                    'completion_tokens': stats.pop('eval_tokens', 0),
+                    'total_tokens': stats.pop('total_tokens', 0)
+                }
+                chunk.usage = CompletionUsage(
+                    prompt_tokens=token_stats['prompt_tokens'],
+                    completion_tokens=token_stats['completion_tokens'],
+                    total_tokens=token_stats['total_tokens'],
+                    extra=stats
+                )
             yield chunk
 
     async def generate(self, prompt, max_tokens=100, temperature=0.7) -> CompletionResponse:
-        return llama_cpp_generate(prompt, self.llm, max_tokens, temperature)
+        response = llama_cpp_generate(prompt, self.llm, max_tokens, temperature)
+        # Get stats and create usage
+        stats = self.get_stats()
+        response.usage.extra = stats
+        return response
     
     async def generate_stream(self, prompt, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
         async for chunk in llama_cpp_generate_stream(prompt, self.llm, max_tokens, temperature):
+            # Check if this is the last chunk
+            if any(choice.finish_reason == 'stop' for choice in chunk.choices):
+                # Get stats and create usage
+                stats = self.get_stats()
+                # Extract token-related fields and keep the rest in extra
+                token_stats = {
+                    'prompt_tokens': stats.pop('prompt_tokens', 0),
+                    'completion_tokens': stats.pop('eval_tokens', 0),
+                    'total_tokens': stats.pop('total_tokens', 0)
+                }
+                chunk.usage = CompletionUsage(
+                    prompt_tokens=token_stats['prompt_tokens'],
+                    completion_tokens=token_stats['completion_tokens'],
+                    total_tokens=token_stats['total_tokens'],
+                    extra=stats
+                )
             yield chunk
 
     def get_stats(self):
         #logger.info(f"Context = {self.llm._ctx}") => llama_cpp._internals.LlamaContext
         #self.llm._ctx.print_timings()
         #print(self.llm._model) #=> llama_cpp._internals.LlamaModel 
-        return self.get_timing_stats()
+        stats = self.get_timing_stats()
+        logger.debug(f"get_stats(self)  = {stats}")
+
+        return stats
 
     def get_timing_stats(self):
-        """Extract timing statistics from llama.cpp context by capturing print_timings() output.
+        """Extract timing statistics from llama.cpp context.
         
         Returns:
             dict: Dictionary containing timing statistics including:
-                - load_time_ms: Model load time in milliseconds
-                - prompt_eval_time_ms: Prompt evaluation time in milliseconds
-                - prompt_tokens: Number of prompt tokens processed
+                - load_time_ms: Model load time in milliseconds (t_load_ms)
+                - prompt_eval_time_ms: Prompt evaluation time in milliseconds (t_p_eval_ms)
+                - prompt_tokens: Number of prompt tokens processed (n_p_eval)
                 - prompt_tokens_per_second: Prompt processing speed
-                - eval_time_ms: Token generation time in milliseconds
-                - eval_tokens: Number of tokens generated
+                - eval_time_ms: Token generation time in milliseconds (t_eval_ms)
+                - eval_tokens: Number of tokens generated (n_eval)
                 - eval_tokens_per_second: Token generation speed
                 - total_time_ms: Total processing time in milliseconds
                 - total_tokens: Total tokens processed
         """
-        import io
-        import sys
-        import re
-        from contextlib import redirect_stdout
-
         try:
-            # Capture stdout
-            f = io.StringIO()
-            with redirect_stdout(f):
-                self.llm._ctx.print_timings()
-            output = f.getvalue()
+            if not hasattr(self.llm, '_ctx') or self.llm._ctx is None:
+                logger.error("llama.cpp context not available")
+                return {}
+
+            # Get performance context data
+            perf_data = llama_cpp.llama_perf_context(self.llm._ctx.ctx)
             
-            logger.debug(f"Timing output: {output}")
+            # Initialize stats dictionary with direct field access
+            stats = {
+                'load_time_ms': perf_data.t_load_ms,
+                'prompt_eval_time_ms': perf_data.t_p_eval_ms,
+                'prompt_tokens': perf_data.n_p_eval,
+                'eval_time_ms': perf_data.t_eval_ms,
+                'eval_tokens': perf_data.n_eval
+            }
             
-            # Parse the output using regex
-            stats = {}
-            
-            # Load time
-            load_match = re.search(r'load time\s*=\s*(\d+\.\d+)\s*ms', output)
-            if load_match:
-                stats['load_time_ms'] = float(load_match.group(1))
-            
-            # Prompt eval time and tokens
-            prompt_match = re.search(r'prompt eval time\s*=\s*(\d+\.\d+)\s*ms\s*/\s*(\d+)\s*tokens', output)
-            if prompt_match:
-                stats['prompt_eval_time_ms'] = float(prompt_match.group(1))
-                stats['prompt_tokens'] = int(prompt_match.group(2))
-                if stats['prompt_eval_time_ms'] > 0:
-                    stats['prompt_tokens_per_second'] = 1e3 / stats['prompt_eval_time_ms'] * stats['prompt_tokens']
-                else:
-                    stats['prompt_tokens_per_second'] = 0.0
-            
-            # Eval time and tokens
-            eval_match = re.search(r'eval time\s*=\s*(\d+\.\d+)\s*ms\s*/\s*(\d+)\s*runs', output)
-            if eval_match:
-                stats['eval_time_ms'] = float(eval_match.group(1))
-                stats['eval_tokens'] = int(eval_match.group(2))
-                if stats['eval_time_ms'] > 0:
-                    stats['eval_tokens_per_second'] = 1e3 / stats['eval_time_ms'] * stats['eval_tokens']
-                else:
-                    stats['eval_tokens_per_second'] = 0.0
-            
-            # Total time and tokens
-            total_match = re.search(r'total time\s*=\s*(\d+\.\d+)\s*ms\s*/\s*(\d+)\s*tokens', output)
-            if total_match:
-                stats['total_time_ms'] = float(total_match.group(1))
-                stats['total_tokens'] = int(total_match.group(2))
+            # Calculate derived statistics
+            if stats['prompt_eval_time_ms'] > 0:
+                stats['prompt_tokens_per_second'] = 1e3 / stats['prompt_eval_time_ms'] * stats['prompt_tokens']
             else:
-                # Calculate totals if not found in output
-                stats['total_time_ms'] = stats.get('prompt_eval_time_ms', 0.0) + stats.get('eval_time_ms', 0.0)
-                stats['total_tokens'] = stats.get('prompt_tokens', 0) + stats.get('eval_tokens', 0)
+                stats['prompt_tokens_per_second'] = 0.0
+                
+            if stats['eval_time_ms'] > 0:
+                stats['eval_tokens_per_second'] = 1e3 / stats['eval_time_ms'] * stats['eval_tokens']
+            else:
+                stats['eval_tokens_per_second'] = 0.0
             
-            logger.debug(f"Parsed stats: {stats}")
+            # Calculate totals
+            stats['total_time_ms'] = stats['prompt_eval_time_ms'] + stats['eval_time_ms']
+            stats['total_tokens'] = stats['prompt_tokens'] + stats['eval_tokens']
+            
             return stats
             
         except Exception as e:

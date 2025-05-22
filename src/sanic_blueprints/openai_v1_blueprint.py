@@ -55,10 +55,8 @@ async def chat_completions(request):
             await response.send(f"data: {response_chunk.model_dump_json(by_alias=True)}\n\n")
         
         # Add timing information in the final [DONE] message
-        app.ctx.model.get_stats()
         await response.send("data: [DONE]\n\n")
         
-        app.ctx.model.get_stats()
         return
 
     
@@ -133,9 +131,8 @@ async def completions(request):
         async for response_chunk in response_from_llm:
             await response.send(f"data: {response_chunk.model_dump_json(by_alias=True)}\n\n")
         
+        # Add timing information in the final [DONE] message
         await response.send("data: [DONE]\n\n")
-
-        logger.debug(f"Stats = {app.ctx.model.get_stats()}")
 
         return
 
