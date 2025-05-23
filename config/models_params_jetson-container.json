@@ -24,13 +24,21 @@
             "model_lib": "/data/models/mlc_llm/model_lib/mlc-ai_gemma-2-2b-it-q4f16-1-mlc_aarch64-cu126-sm87.so"
         }
     },
-    "mlc-server-llama3": {
+    "mlc-server-llama3.2": {
         "type": "CHAT_COMPLETION",
         "name": "MLCModel",
         "params": {
             "model_path": "HF://dusty-nv/Llama-3.2-3B-Instruct-q4f16_ft-MLC",
             "gpu": "True",
             "model_lib": "/data/models/mlc_llm/model_lib/dusty-nv_llama-3.2-3b-q4f16-ft-mlc_aarch64-cu126-sm87.so"
+        }
+    },
+    "llama-server-llama3.2": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/Llama-3.2-3B-Instruct.Q4_K_M.gguf",
+            "gpu": "True"
         }
     },
     "echo-server-with-tokenizer": {
