@@ -33,6 +33,16 @@
             "model_lib": "/data/models/mlc_llm/model_lib/dusty-nv_llama-3.2-3b-q4f16-ft-mlc_aarch64-cu126-sm87.so"
         }
     },
+    "mlc-server-smollm2": {
+        "type": "CHAT_COMPLETION",
+        "name": "MLCModel",
+        "params": {
+            "model_path": "HF://mlc-ai/SmolLM2-1.7B-Instruct-q4f16_1-MLC",
+            "gpu": "True",
+            "model_lib": "/data/models/mlc_llm/model_lib/mlc-ai-smollm2-1.7b-instruct-q4f16_1-mlc_aarch64-cu126-sm87.so"
+        }
+    },
+ 
     "llama-server-llama3.2": {
         "type": "CHAT_COMPLETION",
         "name": "LlamaCppModel",
