@@ -3,6 +3,7 @@ from typing import Any, AsyncGenerator
 from llama_cpp import Llama
 from src.adapters.model_adapter import ModelAdapter
 from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse, CompletionUsage
+from src.utils.constants import N_CTX
 from src.utils.logger import logger
 import llama_cpp
 
@@ -84,7 +85,8 @@ class LlamaCppModel(ModelAdapter):
             model_path=model_path, 
             chat_format="chatml", 
             n_gpu_layers=n_gpu_layers,
-            verbose=True  # Enable verbose output which includes timing information
+            verbose=True,  # Enable verbose output which includes timing information
+            n_ctx=N_CTX
         )
         logger.info(f"Initialized LlamaCppModel with model path: {model_path} and gpu: {gpu}")
         # traceback.print_stack()  # Show where it's being called from
