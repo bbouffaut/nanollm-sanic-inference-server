@@ -42,7 +42,15 @@
             "model_lib": "/data/models/mlc_llm/model_lib/mlc-ai-smollm2-1.7b-instruct-q4f16_1-mlc_aarch64-cu126-sm87.so"
         }
     },
- 
+    "mlc-server-distill-llama-8b": {
+        "type": "CHAT_COMPLETION",
+        "name": "MLCModel",
+        "params": {
+            "model_path": "HF://dusty-nv/DeepSeek-R1-Distill-Llama-8B-q4f16_ft-MLC",
+            "gpu": "True",
+            "model_lib": "/data/models/mlc_llm/model_lib/dusty-nv-deepseek-r1-distill-llama-8b-q4f16_ft-mlc_aarch64-cu126-sm87.so" 
+        }
+    },
     "llama-server-llama3.2": {
         "type": "CHAT_COMPLETION",
         "name": "LlamaCppModel",

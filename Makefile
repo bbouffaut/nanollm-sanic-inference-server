@@ -20,6 +20,9 @@ llama-server-llama3.2:
 mlc-server-smollm2:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-smollm2' python3 -m src.apps.sanic_app
 
+mlc-server-distill-llama-8b:
+	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-distill-llama-8b' python3 -m src.apps.sanic_app
+
 echo-server:
 	ENV_FILE_PATH=./config/.env MODEL_PARAMS_ID='echo-server' python3 -m src.apps.sanic_app
 
