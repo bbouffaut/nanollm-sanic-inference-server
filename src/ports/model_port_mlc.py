@@ -1,12 +1,12 @@
 
 from typing import Any, AsyncGenerator, Optional
 from src.adapters.model_adapter import ModelAdapter
-from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse
+from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse, transform_messages
 from src.utils.logger import logger
 
 from mlc_llm import AsyncMLCEngine
 
-
+    
 
 class MLCModel(ModelAdapter):
 
@@ -18,10 +18,12 @@ class MLCModel(ModelAdapter):
         self.model = model_path
         self.engine = AsyncMLCEngine(model_path, mode='local', device=device_map, model_lib=model_lib)
         logger.info(f'MLC Model instance created with params with {model_path}')
+        logger.info(f"Engine metrics = {self.engine.metrics()}")
           
 
     async def generate_chat_stream(self, messages, max_tokens: Optional[int], temperature: Optional[float]) -> AsyncGenerator[CompletionResponse, Any]:
         logger.debug(f"MLC ChatGenerateSTREAM with model {self.model} and messages {messages}")
+        messages = transform_messages(messages)
         async for chunk in await self.engine.chat.completions.create(
             messages=messages,
             model=self.model,
@@ -36,6 +38,8 @@ class MLCModel(ModelAdapter):
     
     async def generate_chat(self, messages, max_tokens=100, temperature=0.7) -> ChatCompletionResponse:
         logger.debug(f"MLC ChatGenerate with model {self.model} and messages {messages}")
+        messages = transform_messages(messages)
+
         response: ChatCompletionResponse = await self.engine.chat.completions.create(
             messages=messages,
             model=self.model,

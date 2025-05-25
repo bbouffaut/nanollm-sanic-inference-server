@@ -423,3 +423,28 @@ def openai_api_get_unsupported_fields(
         if hasattr(request, field) and getattr(request, field) != value:
             unsupported_fields.append(field)
     return unsupported_fields
+
+
+def transform_messages(messages: List[ChatCompletionMessage]) -> List[ChatCompletionMessage]:
+    """Transform messages to ensure they pass validation rules.
+    Specifically, converts list content to single content for non-user messages.
+    
+    Args:
+        messages: List of ChatCompletionMessage objects to transform
+        
+    Returns:
+        List of transformed ChatCompletionMessage objects
+    """
+    transformed_messages = []
+    for message in messages:
+        if 'content' in message and isinstance(message['content'], list) and 'role' in message and message['role'] != "user":
+            # Convert list content to a single string by joining all text content
+            text_content = []
+            for item in message['content']:
+                if isinstance(item, dict) and "text" in item:
+                    text_content.append(item["text"])
+                elif isinstance(item, str):
+                    text_content.append(item)
+            message['content'] = " ".join(text_content)
+        transformed_messages.append(message)
+    return transformed_messages
