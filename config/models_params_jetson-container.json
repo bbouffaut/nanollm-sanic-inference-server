@@ -59,7 +59,16 @@
             "gpu": "True"
         }
     },
-    "echo-server-with-tokenizer": {
+    "mlc-server-qwen2.5-coder-7b": {
+        "type": "CHAT_COMPLETION",
+        "name": "MLCModel",
+        "params": {
+            "model_path": "/data/models/mlc_llm/Qwen/Qwen2.5-Coder-7B-Instruct-q4f16_ft-MLC",
+            "gpu": "True",
+            "model_lib": "/data/models/mlc_llm/model_lib/qwen2.5-coder-7b-instruct_aarch64-cu126-sm87.so" 
+        }
+    },
+     "echo-server-with-tokenizer": {
         "type": "NONE",
         "name": "EchoModelWithTokenizer",
         "params": {}

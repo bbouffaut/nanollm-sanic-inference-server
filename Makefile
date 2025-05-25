@@ -23,6 +23,10 @@ mlc-server-smollm2:
 mlc-server-distill-llama-8b:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-distill-llama-8b' python3 -m src.apps.sanic_app
 
+# Launch dusty-nv docker to create mlc-chat-config.json and the *.so lib file
+mlc-server-qwen2.5-coder-7b:
+	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-qwen2.5-coder-7b' python3 -m src.apps.sanic_app
+
 echo-server:
 	ENV_FILE_PATH=./config/.env MODEL_PARAMS_ID='echo-server' python3 -m src.apps.sanic_app
 
