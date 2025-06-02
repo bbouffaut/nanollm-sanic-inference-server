@@ -63,7 +63,7 @@
         "type": "CHAT_COMPLETION",
         "name": "MLCModel",
         "params": {
-            "model_path": "/data/models/mlc_llm/Qwen/Qwen2.5-Coder-7B-Instruct-q4f16_ft-MLC/mlc-chat-config_updated.json",
+            "model_path": "/data/models/mlc_llm/Qwen/Qwen2.5-Coder-7B-Instruct-q4f16_ft-MLC",
             "gpu": "True",
             "model_lib": "/data/models/mlc_llm/model_lib/qwen2.5-coder-7b-instruct_aarch64-cu126-sm87_8192-context-window.so" 
         }
