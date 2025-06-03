@@ -15,6 +15,14 @@
             "gpu": "True"
         }
     },
+    "llama-server-qwen2.5": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf",
+            "gpu": "True"
+        }
+    },
     "mlc-server-gemma2": {
         "type": "CHAT_COMPLETION",
         "name": "MLCModel",
