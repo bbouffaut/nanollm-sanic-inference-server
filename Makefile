@@ -20,6 +20,9 @@ llama-server-llama3.2:
 llama-server-qwen2.5:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='llama-server-qwen2.5' python3 -m src.apps.sanic_app
 
+llama-server-smollm2-1.7b-instruct:
+	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='llama-server-smollm2-1.7b-instruct' python3 -m src.apps.sanic_app
+
 mlc-server-smollm2:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-smollm2' python3 -m src.apps.sanic_app
 
@@ -33,6 +36,7 @@ mlc-server-qwen2.5-coder-7b:
 # Launch dusty-nv docker to create mlc-chat-config.json and the *.so lib file
 mlc-server-llama3.1-8b-instruct:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-llama3.1-8b-instruct' python3 -m src.apps.sanic_app
+
 
 echo-server:
 	ENV_FILE_PATH=./config/.env MODEL_PARAMS_ID='echo-server' python3 -m src.apps.sanic_app
