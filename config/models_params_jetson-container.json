@@ -23,11 +23,27 @@
             "gpu": "True"
         }
     },
+    "llama-server-stablelm-zephyr-3b": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/stablelm-zephyr-3b.Q4_K_M.gguf",
+            "gpu": "True"
+        }
+    },
     "llama-server-smollm2-1.7b-instruct": {
         "type": "CHAT_COMPLETION",
         "name": "LlamaCppModel",
         "params": {
             "model_path": "/data/models/huggingface/SmolLM2-1.7B-Instruct-Q4_K_M.gguf",
+            "gpu": "True"
+        }
+    },
+    "llama-server-hermes-llama-3-8b": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/Hermes-2-Pro-Llama-3-8B-Q4_K_M.gguf",
             "gpu": "True"
         }
     },

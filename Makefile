@@ -23,6 +23,12 @@ llama-server-qwen2.5:
 llama-server-smollm2-1.7b-instruct:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='llama-server-smollm2-1.7b-instruct' python3 -m src.apps.sanic_app
 
+llama-server-stablelm-zephyr-3b:
+	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='llama-server-stablelm-zephyr-3b' python3 -m src.apps.sanic_app
+
+llama-server-hermes-llama-3-8b:
+	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='llama-server-hermes-llama-3-8b' python3 -m src.apps.sanic_app
+
 mlc-server-smollm2:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-smollm2' python3 -m src.apps.sanic_app
 
