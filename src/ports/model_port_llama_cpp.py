@@ -80,6 +80,7 @@ class LlamaCppModel(ModelAdapter):
 
     def __init__(self, model_path: str, gpu: bool):
         #import traceback
+        self.model = model_path
         n_gpu_layers = -1 if gpu else 0
         self.llm = Llama(
             model_path=model_path, 
@@ -92,6 +93,7 @@ class LlamaCppModel(ModelAdapter):
         # traceback.print_stack()  # Show where it's being called from
 
     async def generate_chat(self, messages, max_tokens=100, temperature=0.7) -> CompletionResponse:
+        logger.debug(f"LlamaCpp ChatGenerate with model {self.model} and messages {messages}")
         response = llama_cpp_generate_chat(messages, self.llm, max_tokens, temperature)
         # Get stats and create usage
         stats = self.get_stats()
@@ -100,6 +102,7 @@ class LlamaCppModel(ModelAdapter):
         return response
     
     async def generate_chat_stream(self, messages, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
+        logger.debug(f"LlamaCpp ChatGenerateStream with model {self.model} and messages {messages}")
         async for chunk in llama_cpp_generate_chat_stream(messages, self.llm, max_tokens, temperature):
             # Check if this is the last chunk
             if any(choice.finish_reason == 'stop' for choice in chunk.choices):
@@ -119,14 +122,16 @@ class LlamaCppModel(ModelAdapter):
                 )
             yield chunk
 
-    async def generate(self, prompt, max_tokens=100, temperature=0.7) -> CompletionResponse:
+    async def generate(self, prompt, max_tokens=100000, temperature=0.7) -> CompletionResponse:
+        logger.debug(f"LlamaCpp Generate with model {self.model} and prompt {prompt}")
         response = llama_cpp_generate(prompt, self.llm, max_tokens, temperature)
         # Get stats and create usage
         stats = self.get_stats()
         response.usage.extra = stats
         return response
     
-    async def generate_stream(self, prompt, max_tokens=100, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
+    async def generate_stream(self, prompt, max_tokens=100000, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
+        logger.debug(f"LlamaCpp GenerateStream with model {self.model} and prompt {prompt}")
         async for chunk in llama_cpp_generate_stream(prompt, self.llm, max_tokens, temperature):
             # Check if this is the last chunk
             if any(choice.finish_reason == 'stop' for choice in chunk.choices):
