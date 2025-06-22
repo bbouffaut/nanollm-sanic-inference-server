@@ -91,6 +91,14 @@
             "gpu": "True"
         }
     },
+    "llama-server-deepseek-r1-distill-llama-8b": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/DeepSeek-R1-Distill-Llama-8B-Q3_K_L.gguf",
+            "gpu": "True"
+        }
+    },
     "mlc-server-qwen2.5-coder-7b": {
         "type": "CHAT_COMPLETION",
         "name": "MLCModel",
