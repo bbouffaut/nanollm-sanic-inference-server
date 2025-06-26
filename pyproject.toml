@@ -5,6 +5,7 @@ description = "LLM server with OpenAI interface running different backend"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "arize-phoenix-otel>=0.12.1",
     "asyncio>=3.4.3",
     "langchain>=0.3.25",
     "langchain-llm>=0.4.15",
