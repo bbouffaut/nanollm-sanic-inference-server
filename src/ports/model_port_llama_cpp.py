@@ -3,6 +3,7 @@ from typing import Any, AsyncGenerator
 from llama_cpp import Llama
 from src.adapters.model_adapter import ModelAdapter
 from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, ChatCompletionStreamResponse, CompletionResponse, CompletionUsage
+from src.utils import tracer
 from src.utils.constants import N_CTX
 from src.utils.logger import logger
 import llama_cpp
@@ -92,6 +93,7 @@ class LlamaCppModel(ModelAdapter):
         logger.info(f"Initialized LlamaCppModel with model path: {model_path} and gpu: {gpu}")
         # traceback.print_stack()  # Show where it's being called from
 
+    @tracer.chain
     async def generate_chat(self, messages, max_tokens=100000, temperature=0.7) -> CompletionResponse:
         logger.debug(f"LlamaCpp ChatGenerate with model {self.model} and messages {messages}")
         response = llama_cpp_generate_chat(messages, self.llm, max_tokens, temperature)
@@ -101,6 +103,7 @@ class LlamaCppModel(ModelAdapter):
         response.usage.extra = stats
         return response
     
+    @tracer.chain
     async def generate_chat_stream(self, messages, max_tokens=100000, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
         logger.debug(f"LlamaCpp ChatGenerateStream with model {self.model} and messages {messages}")
         async for chunk in llama_cpp_generate_chat_stream(messages, self.llm, max_tokens, temperature):
@@ -122,6 +125,7 @@ class LlamaCppModel(ModelAdapter):
                 )
             yield chunk
 
+    @tracer.chain
     async def generate(self, prompt, max_tokens=100000, temperature=0.7) -> CompletionResponse:
         logger.debug(f"LlamaCpp Generate with model {self.model} and prompt {prompt}")
         response = llama_cpp_generate(prompt, self.llm, max_tokens, temperature)
@@ -130,6 +134,7 @@ class LlamaCppModel(ModelAdapter):
         response.usage.extra = stats
         return response
     
+    @tracer.chain
     async def generate_stream(self, prompt, max_tokens=100000, temperature=0.7) -> AsyncGenerator[CompletionResponse, Any]:
         logger.debug(f"LlamaCpp GenerateStream with model {self.model} and prompt {prompt}")
         async for chunk in llama_cpp_generate_stream(prompt, self.llm, max_tokens, temperature):
