@@ -47,6 +47,14 @@
             "gpu": "True"
         }
     },
+    "llama-server-bitagent-8b": {
+        "type": "CHAT_COMPLETION",
+        "name": "LlamaCppModel",
+        "params": {
+            "model_path": "/data/models/huggingface/BitAgent-8B.Q4_K_M.gguf",
+            "gpu": "True"
+        }
+    },
     "mlc-server-gemma2": {
         "type": "CHAT_COMPLETION",
         "name": "MLCModel",

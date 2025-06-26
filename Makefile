@@ -32,6 +32,9 @@ llama-server-hermes-llama-3-8b:
 llama-server-deepseek-r1-distill-llama-8b:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='llama-server-deepseek-r1-distill-llama-8b' python3 -m src.apps.sanic_app
 
+llama-server-bitagent-8b:
+	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='llama-server-bitagent-8b' python3 -m src.apps.sanic_app
+
 mlc-server-smollm2:
 	ENV_FILE_PATH=./config/.env TRANSFORMERS_CACHE=/data/models/huggingface/hub/ HF_HOME=/data/models/huggingface/hub/ MODEL_PARAMS_ID='mlc-server-smollm2' python3 -m src.apps.sanic_app
 
