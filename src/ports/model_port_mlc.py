@@ -2,7 +2,7 @@
 from typing import Any, AsyncGenerator, Optional
 from src.adapters.model_adapter import ModelAdapter
 from src.adapters.openai.openai_api_protocol import ChatCompletionResponse, CompletionResponse, transform_messages
-from src.utils import tracer
+from src.utils.tracer import tracer
 from src.utils.logger import logger
 
 from mlc_llm import AsyncMLCEngine
