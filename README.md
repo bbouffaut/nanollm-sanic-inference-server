@@ -1,7 +1,10 @@
 # Launch Dev Docker env to LAUNCH MANUALLY sanic server
 `/ssd/workspace/nanollm_sanic_inference_server/run-bash.sh`
+In Docker container:
+`cd /workspace/nanollm_sanic_inference_server/`
 
 # Launch Prod Docker env to LAUNCH SERVER directly
+### (DOES NOT WORK SINCE DOCKER IMAGE IS NOT UPDATED)
 `/ssd/workspace/nanollm_sanic_inference_server/run-mlc-server.sh llama-server-hermes-llama-3-8b`
 
 
