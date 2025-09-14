@@ -2,6 +2,7 @@
 `/ssd/workspace/nanollm_sanic_inference_server/run-bash.sh`
 In Docker container:
 `cd /workspace/nanollm_sanic_inference_server/`
+`make llama-server-gemma3`
 
 # Launch Prod Docker env to LAUNCH SERVER directly
 ### (DOES NOT WORK SINCE DOCKER IMAGE IS NOT UPDATED)
